@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "ray.h"
 #include "vec3.h"
 
 void printTestImage()
@@ -55,9 +56,21 @@ void testVec3()
 	std::cout << c << std::endl;
 }
 
+void testRay()
+{
+	ray r;
+	std::cout << r.origin() << " " << r.direction() << std::endl;
+	std::cout << r.to(5) << std::endl;
+
+	ray r1(vec3(), vec3(1, 1, 0));
+	std::cout << r1.origin() << " " << r1.direction() << std::endl;
+	std::cout << r1.to(2) << std::endl;
+}
+
 int main()
 {
 	// testVec3();
+	// testRay();
 	printTestImage();
 
 	return 0;

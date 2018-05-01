@@ -21,6 +21,8 @@ public:
 	vec3() { x = 0; y = 0; z = 0; }
 	vec3(comp_t _x, comp_t _y, comp_t _z) { x = _x; y = _y; z = _z; }
 
+	inline vec3 &operator=(const vec3 &v) { x = v.x; y = v.y; z = v.z; return *this; }
+
 	inline const vec3 &operator+() const { return *this; }
 	inline vec3 operator-() const { return vec3(-x, -y, -z); }
 	inline comp_t operator[](uint i) const { return e[i]; }

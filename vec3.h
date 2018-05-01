@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include <math.h>
-#include <stdlib.h>
 
 template<class comp_t=float>
 class vec3

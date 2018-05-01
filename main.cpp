@@ -2,9 +2,22 @@
 
 #include "ray.h"
 #include "vec3.h"
+#include "util.h"
+
+vec3 bgColour(const ray &r)
+{
+	vec3 d = normalize(r.direction());
+	float t = 0.5 * (d.y + 1.0);
+	return lerp(vec3(1, 1, 1), vec3(0.2, 0.0, 0.1), t);
+}
 
 void printTestImage()
 {
+	vec3 bottomLeft(-2.0, -1.0, -1.0);
+	vec3 horizontal(4.0, 0.0, 0.0);
+	vec3 vertical(0.0, 2.0, 0.0);
+	vec3 origin(0, 0, 0);
+
 	int nx = 200;
 	int ny = 100;
 	std::cout << "P3\n" << nx << " " << ny << "\n255\n";
@@ -12,9 +25,12 @@ void printTestImage()
 	{
 		for (int col = 0; col < nx; col++)
 		{
-			vec3 v(float(col) / nx, float(row) / ny, 0.2f);
-			v *= 255.99;
-			std::cout << int(v.r) << " " << int(v.g) << " " << int(v.b) << "\n";
+			float u = float(col) / nx;
+			float v = float(row) / ny;
+			ray r(origin, bottomLeft + u * horizontal + v * vertical);
+			vec3 colour = bgColour(r);
+			colour *= 255.99;
+			std::cout << int(colour.r) << " " << int(colour.g) << " " << int(colour.b) << "\n";
 		}
 	}
 }

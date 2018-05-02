@@ -1,8 +1,8 @@
 #include <iostream>
 
+#include "math.h"
 #include "ray.h"
 #include "vec3.h"
-#include "util.h"
 
 vec3 bgColour(const ray &r)
 {

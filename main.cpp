@@ -1,11 +1,14 @@
 #include <iostream>
 
+#include "geometry.h"
 #include "math.h"
 #include "ray.h"
 #include "vec3.h"
 
-vec3 bgColour(const ray &r)
+vec3 getColour(const ray &r)
 {
+	if (hitSphere(vec3(0, 0, -1), 0.5, r))
+		return vec3(1, 0, 0);
 	vec3 d = normalize(r.direction());
 	float t = 0.5 * (d.y + 1.0);
 	return lerp(vec3(1, 1, 1), vec3(0.2, 0.0, 0.1), t);
@@ -28,7 +31,7 @@ void printTestImage()
 			float u = float(col) / nx;
 			float v = float(row) / ny;
 			ray r(origin, bottomLeft + u * horizontal + v * vertical);
-			vec3 colour = bgColour(r);
+			vec3 colour = getColour(r);
 			colour *= 255.99;
 			std::cout << int(colour.r) << " " << int(colour.g) << " " << int(colour.b) << "\n";
 		}

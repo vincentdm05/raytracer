@@ -1,2 +1,4 @@
 ### Compile with g++ -Wall -std=c++11 -o raytracer main.cpp
 ### Run with ./raytracer
+
+Example usage: `g++ -Wall -std=c++11 -o raytracer main.cpp && ./raytracer > img.ppm && open img.ppm`

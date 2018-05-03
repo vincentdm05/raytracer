@@ -7,11 +7,17 @@
 
 vec3 getColour(const ray &r)
 {
-	if (hitSphere(vec3(0, 0, -1), 0.5, r))
-		return vec3(1, 0, 0);
+	vec3 sphereCenter(0, 0, -1);
+	real_t sphereRadius = 0.5;
+	real_t result = hitSphere(sphereCenter, sphereRadius, r);
+	if (result > 0.0)
+	{
+		vec3 normal = normalize(r.to(result) - sphereCenter);
+		return (normal + 1) * 0.5;
+	}
 	vec3 d = normalize(r.direction());
-	real_t t = 0.5 * (d.y + 1.0);
-	return lerp(vec3(1, 1, 1), vec3(0.2, 0.0, 0.1), t);
+	real_t background = 0.5 * (d.y + 1.0);
+	return lerp(vec3(0.619, 1, 0.694), vec3(1, 0.639, 0.619), background);
 }
 
 void printTestImage()

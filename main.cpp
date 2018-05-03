@@ -10,7 +10,7 @@ vec3 getColour(const ray &r)
 	if (hitSphere(vec3(0, 0, -1), 0.5, r))
 		return vec3(1, 0, 0);
 	vec3 d = normalize(r.direction());
-	float t = 0.5 * (d.y + 1.0);
+	real_t t = 0.5 * (d.y + 1.0);
 	return lerp(vec3(1, 1, 1), vec3(0.2, 0.0, 0.1), t);
 }
 
@@ -28,8 +28,8 @@ void printTestImage()
 	{
 		for (int col = 0; col < nx; col++)
 		{
-			float u = float(col) / nx;
-			float v = float(row) / ny;
+			real_t u = real_t(col) / nx;
+			real_t v = real_t(row) / ny;
 			ray r(origin, bottomLeft + u * horizontal + v * vertical);
 			vec3 colour = getColour(r);
 			colour *= 255.99;

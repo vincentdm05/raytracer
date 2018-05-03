@@ -1,5 +1,7 @@
 #pragma once
 
+#include "common.h"
+
 #include "vec3.h"
 
 class ray
@@ -14,5 +16,5 @@ public:
 
 	const vec3 &origin() const { return o; }
 	const vec3 &direction() const { return d; }
-	vec3 to(comp_t t) const { return o + t * d; }
+	vec3 to(real_t t) const { return o + t * d; }
 };

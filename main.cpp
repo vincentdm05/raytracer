@@ -1,24 +1,22 @@
 #include "Common.hpp"
 
-#include "Geometry.hpp"
 #include "Math.hpp"
 #include "Ray.hpp"
+#include "Scene.hpp"
+#include "Sphere.hpp"
 #include "Vec3.hpp"
 
 #include <iostream>
 
-Vec3 getColour(const Ray &r)
+Vec3 getColour(const Ray &r, const Scene &scene)
 {
-	Vec3 sphereCenter(0, 0, -1);
-	Real sphereRadius = 0.5;
-	Real result = hitSphere(sphereCenter, sphereRadius, r);
-	if (result > 0.0)
-	{
-		Vec3 normal = normalize(r.to(result) - sphereCenter);
-		return (normal + 1) * 0.5;
-	}
+	HitRecord rec;
+	if (scene.hit(r, 0.0, MAXFLOAT, rec))
+		return (normalize(rec.normal) + 1) * 0.5;
+
 	Vec3 d = normalize(r.direction());
 	Real background = 0.5 * (d.y + 1.0);
+	// return lerp(Vec3(1, 1, 1), Vec3(0.5, 0.7, 1.0), background);
 	return lerp(Vec3(0.619, 1, 0.694), Vec3(1, 0.639, 0.619), background);
 }
 
@@ -28,6 +26,12 @@ void printTestImage()
 	Vec3 horizontal(4.0, 0.0, 0.0);
 	Vec3 vertical(0.0, 2.0, 0.0);
 	Vec3 origin(0, 0, 0);
+
+	Sphere sphere(Vec3(0, 0, -1), 0.5);
+	Sphere ground(Vec3(0, -100.5, -1), 100);
+	Scene scene;
+	scene.add(sphere);
+	scene.add(ground);
 
 	int nx = 200;
 	int ny = 100;
@@ -39,7 +43,7 @@ void printTestImage()
 			Real u = Real(col) / nx;
 			Real v = Real(row) / ny;
 			Ray r(origin, bottomLeft + u * horizontal + v * vertical);
-			Vec3 colour = getColour(r);
+			Vec3 colour = getColour(r, scene);
 			colour *= 255.99;
 			std::cout << int(colour.r) << " " << int(colour.g) << " " << int(colour.b) << "\n";
 		}

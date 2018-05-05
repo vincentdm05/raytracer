@@ -51,7 +51,8 @@ void printTestImage()
 				Ray r = camera.getRay(u, v);
 				colour += getColour(r, scene);
 			}
-			colour *= 255.99 / ns;
+			// gamma 2 correction
+			colour = 255.99 * sqrt(colour / ns);
 			std::cout << int(colour.r) << " " << int(colour.g) << " " << int(colour.b) << "\n";
 		}
 	}

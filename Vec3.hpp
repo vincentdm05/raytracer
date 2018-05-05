@@ -200,3 +200,8 @@ inline Vec3 normalize(const Vec3 &v)
 	Real invl = 1 / v.length();
 	return v * invl;
 }
+
+inline Vec3 sqrt(const Vec3 &v)
+{
+	return Vec3(sqrt(v.x), sqrt(v.y), sqrt(v.z));
+}

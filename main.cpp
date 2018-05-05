@@ -1,5 +1,6 @@
 #include "Common.hpp"
 
+#include "Camera.hpp"
 #include "Math.hpp"
 #include "Ray.hpp"
 #include "Scene.hpp"
@@ -7,6 +8,7 @@
 #include "Vec3.hpp"
 
 #include <iostream>
+#include <random>
 
 Vec3 getColour(const Ray &r, const Scene &scene)
 {
@@ -22,10 +24,7 @@ Vec3 getColour(const Ray &r, const Scene &scene)
 
 void printTestImage()
 {
-	Vec3 bottomLeft(-2.0, -1.0, -1.0);
-	Vec3 horizontal(4.0, 0.0, 0.0);
-	Vec3 vertical(0.0, 2.0, 0.0);
-	Vec3 origin(0, 0, 0);
+	Camera camera(Vec3(-2.0, -1.0, -1.0), Vec3(4.0, 0.0, 0.0), Vec3(0.0, 2.0, 0.0), Vec3(0, 0, 0));
 
 	Sphere sphere(Vec3(0, 0, -1), 0.5);
 	Sphere ground(Vec3(0, -100.5, -1), 100);
@@ -35,16 +34,21 @@ void printTestImage()
 
 	int nx = 200;
 	int ny = 100;
+	int ns = 100;
 	std::cout << "P3\n" << nx << " " << ny << "\n255\n";
 	for (int row = ny - 1; row >= 0; row--)
 	{
 		for (int col = 0; col < nx; col++)
 		{
-			Real u = Real(col) / nx;
-			Real v = Real(row) / ny;
-			Ray r(origin, bottomLeft + u * horizontal + v * vertical);
-			Vec3 colour = getColour(r, scene);
-			colour *= 255.99;
+			Vec3 colour;
+			for (int s = 0; s < ns; s++)
+			{
+				Real u = (col + drand48()) / nx;
+				Real v = (row + drand48()) / ny;
+				Ray r = camera.getRay(u, v);
+				colour += getColour(r, scene);
+			}
+			colour *= 255.99 / ns;
 			std::cout << int(colour.r) << " " << int(colour.g) << " " << int(colour.b) << "\n";
 		}
 	}
@@ -96,6 +100,11 @@ void testRay()
 	Ray r1(Vec3(), Vec3(1, 1, 0));
 	std::cout << r1.origin() << " " << r1.direction() << std::endl;
 	std::cout << r1.to(2) << std::endl;
+
+	Camera camera(Vec3(-2.0, -1.0, -1.0), Vec3(4.0, 0.0, 0.0), Vec3(0.0, 2.0, 0.0), Vec3(0, 0, 0));
+	Ray ray = camera.getRay(0.5, 0.5);
+	std::cout << ray.origin() << " " << ray.direction() << std::endl;
+	std::cout << ray.to(2) << std::endl;
 }
 
 int main()

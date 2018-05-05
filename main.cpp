@@ -14,7 +14,10 @@ Vec3 getColour(const Ray &r, const Scene &scene)
 {
 	HitRecord rec;
 	if (scene.hit(r, 0.0, MAXFLOAT, rec))
-		return (normalize(rec.normal) + 1) * 0.5;
+	{
+		Vec3 lambertianOut = rec.normal + sampleUnitSphere();
+		return getColour(Ray(rec.point, lambertianOut), scene) * 0.5;
+	}
 
 	Vec3 d = normalize(r.direction());
 	Real background = 0.5 * (d.y + 1.0);

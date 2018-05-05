@@ -13,7 +13,7 @@
 Vec3 getColour(const Ray &r, const Scene &scene)
 {
 	HitRecord rec;
-	if (scene.hit(r, 0.0, MAXFLOAT, rec))
+	if (scene.hit(r, 0.001, MAXFLOAT, rec))
 	{
 		Vec3 lambertianOut = rec.normal + sampleUnitSphere();
 		return getColour(Ray(rec.point, lambertianOut), scene) * 0.5;

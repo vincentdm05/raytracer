@@ -5,11 +5,14 @@
 #include "Ray.hpp"
 #include "Vec3.hpp"
 
+class Material;
+
 struct HitRecord
 {
 	Real t;
 	Vec3 normal;
 	Vec3 point;
+	Material *material;
 };
 
 class Hitable

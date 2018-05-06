@@ -4,15 +4,18 @@
 
 #include "Hitable.hpp"
 
+class Material;
+
 class Sphere : public Hitable
 {
 private:
 	Vec3 center;
 	Real radius = 1.0;
+	Material *material = nullptr;
 
 public:
 	Sphere() {}
-	Sphere(const Vec3 &_center, Real _radius) { center = _center; radius = _radius; }
+	Sphere(const Vec3 &_center, Real _radius, Material *_material) { center = _center; radius = _radius; material = _material; }
 
 	virtual bool hit(const Ray &r, Real minDist, Real maxDist, HitRecord &rec) const;
 };
@@ -34,6 +37,7 @@ bool Sphere::hit(const Ray &r, Real minDist, Real maxDist, HitRecord &rec) const
 		// 	rec.t = temp;
 		// 	rec.point = r.to(rec.t);
 		// 	rec.normal = (rec.point - center) / radius;
+		//	rec.material = material;
 		// 	return true;
 		// }
 		// temp = (-b + discriminant) / a;
@@ -42,6 +46,7 @@ bool Sphere::hit(const Ray &r, Real minDist, Real maxDist, HitRecord &rec) const
 		// 	rec.t = temp;
 		// 	rec.point = r.to(rec.t);
 		// 	rec.normal = (rec.point - center) / radius;
+		//	rec.material = material;
 		// 	return true;
 		// }
 
@@ -62,6 +67,7 @@ bool Sphere::hit(const Ray &r, Real minDist, Real maxDist, HitRecord &rec) const
 			rec.t = (-b + discriminant) / a;
 			rec.point = r.to(rec.t);
 			rec.normal = (rec.point - center) / radius;
+			rec.material = material;
 		}
 	}
 

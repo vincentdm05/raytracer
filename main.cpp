@@ -1,7 +1,9 @@
 #include "Common.hpp"
 
 #include "Camera.hpp"
+#include "Lambertian.hpp"
 #include "Math.hpp"
+#include "Metal.hpp"
 #include "Ray.hpp"
 #include "Scene.hpp"
 #include "Sphere.hpp"
@@ -10,13 +12,17 @@
 #include <iostream>
 #include <random>
 
-Vec3 getColour(const Ray &r, const Scene &scene)
+Vec3 getColour(const Ray &r, const Scene &scene, int depth = 0)
 {
 	HitRecord rec;
 	if (scene.hit(r, 0.001, MAXFLOAT, rec))
 	{
-		Vec3 lambertianOut = rec.normal + sampleUnitSphere();
-		return getColour(Ray(rec.point, lambertianOut), scene) * 0.5;
+		Ray scattered;
+		Vec3 attenuation;
+		if (depth < 50 && rec.material && rec.material->scatter(r, rec, attenuation, scattered))
+			return getColour(scattered, scene, depth + 1) * attenuation;
+		else
+			return Vec3();
 	}
 
 	Vec3 d = normalize(r.direction());
@@ -29,11 +35,20 @@ void printTestImage()
 {
 	Camera camera(Vec3(-2.0, -1.0, -1.0), Vec3(4.0, 0.0, 0.0), Vec3(0.0, 2.0, 0.0), Vec3(0, 0, 0));
 
-	Sphere sphere(Vec3(0, 0, -1), 0.5);
-	Sphere ground(Vec3(0, -100.5, -1), 100);
+	Lambertian material0(Vec3(0.8, 0.3, 0.3));
+	Lambertian material1(Vec3(0.8, 0.8, 0.0));
+	Metal material2(Vec3(0.8, 0.6, 0.2));
+	Metal material3(Vec3(0.8, 0.8, 0.8));
+
+	Sphere sphere(Vec3(0, 0, -1), 0.5, &material0);
+	Sphere ground(Vec3(0, -100.5, -1), 100, &material1);
+	Sphere metallicSphere0(Vec3(1, 0, -1), 0.5, &material2);
+	Sphere metallicSphere1(Vec3(-1, 0, -1), 0.5, &material3);
 	Scene scene;
 	scene.add(sphere);
 	scene.add(ground);
+	scene.add(metallicSphere0);
+	scene.add(metallicSphere1);
 
 	int nx = 200;
 	int ny = 100;

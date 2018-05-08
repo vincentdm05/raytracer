@@ -38,10 +38,12 @@ void printTestImage()
 	Lambertian material0(Vec3(0.8, 0.3, 0.3));
 	Lambertian material1(Vec3(0.8, 0.8, 0.0));
 	Metal material2(Vec3(0.8, 0.6, 0.2));
-	Metal material3(Vec3(0.8, 0.8, 0.8));
+	Metal material3(Vec3(0.8, 0.8, 0.8), 1.0);
+	Metal material4(Vec3(0.8, 0.8, 0.0), 0.3);
 
 	Sphere sphere(Vec3(0, 0, -1), 0.5, &material0);
-	Sphere ground(Vec3(0, -100.5, -1), 100, &material1);
+	// Sphere ground(Vec3(0, -100.5, -1), 100, &material1);
+	Sphere ground(Vec3(0, -100.5, -1), 100, &material4);
 	Sphere metallicSphere0(Vec3(1, 0, -1), 0.5, &material2);
 	Sphere metallicSphere1(Vec3(-1, 0, -1), 0.5, &material3);
 	Scene scene;

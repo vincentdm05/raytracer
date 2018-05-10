@@ -11,12 +11,13 @@
 #include "Vec3.hpp"
 
 #include <iostream>
+#include <limits>
 #include <random>
 
 Vec3 getColour(const Ray &r, const Scene &scene, int depth = 0)
 {
 	HitRecord rec;
-	if (scene.hit(r, 0.001, MAXFLOAT, rec))
+	if (scene.hit(r, 0.001, std::numeric_limits<Real>::max(), rec))
 	{
 		Ray scattered;
 		Vec3 attenuation;

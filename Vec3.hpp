@@ -206,7 +206,22 @@ inline Vec3 sqrt(const Vec3 &v)
 	return Vec3(sqrt(v.x), sqrt(v.y), sqrt(v.z));
 }
 
+// n is assumed to be of unit length
 inline Vec3 reflect(const Vec3 &v, const Vec3 &n)
 {
 	return v - 2 * dot(v, n) * n;
+}
+
+// v and n are assumed to be of unit length
+inline bool refract(const Vec3 &v, const Vec3 &n, Real refractiveIndexRatio, Vec3 &refracted)
+{
+	Real vDotN = dot(v, n);
+	Real discriminant = 1 - refractiveIndexRatio * refractiveIndexRatio * (1 - vDotN * vDotN);
+	if (discriminant > 0)
+	{
+		refracted = refractiveIndexRatio * (v - n * vDotN) - n * sqrt(discriminant);
+		return true;
+	}
+
+	return false;
 }

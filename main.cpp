@@ -1,5 +1,6 @@
 #include "Common.hpp"
 
+#include "Dielectric.hpp"
 #include "Camera.hpp"
 #include "Lambertian.hpp"
 #include "Math.hpp"
@@ -36,21 +37,21 @@ void printTestImage()
 	Camera camera(Vec3(-2.0, -1.0, -1.0), Vec3(4.0, 0.0, 0.0), Vec3(0.0, 2.0, 0.0), Vec3(0, 0, 0));
 
 	Lambertian material0(Vec3(0.8, 0.3, 0.3));
-	Lambertian material1(Vec3(0.8, 0.8, 0.0));
+	Metal material1(Vec3(0.8, 0.8, 0.0), 0.3);
 	Metal material2(Vec3(0.8, 0.6, 0.2));
-	Metal material3(Vec3(0.8, 0.8, 0.8), 1.0);
-	Metal material4(Vec3(0.8, 0.8, 0.0), 0.3);
+	Dielectric material3(1.5);
 
 	Sphere sphere(Vec3(0, 0, -1), 0.5, &material0);
-	// Sphere ground(Vec3(0, -100.5, -1), 100, &material1);
-	Sphere ground(Vec3(0, -100.5, -1), 100, &material4);
-	Sphere metallicSphere0(Vec3(1, 0, -1), 0.5, &material2);
-	Sphere metallicSphere1(Vec3(-1, 0, -1), 0.5, &material3);
+	Sphere ground(Vec3(0, -100.5, -1), 100, &material1);
+	Sphere metallicSphere(Vec3(1, 0, -1), 0.5, &material2);
+	Sphere transparentSphere(Vec3(-1, 0, -1), 0.5, &material3);
+	Sphere transparentSphereHollow(Vec3(-1, 0, -1), -0.45, &material3);
 	Scene scene;
 	scene.add(sphere);
 	scene.add(ground);
-	scene.add(metallicSphere0);
-	scene.add(metallicSphere1);
+	scene.add(metallicSphere);
+	scene.add(transparentSphere);
+	scene.add(transparentSphereHollow);
 
 	int nx = 200;
 	int ny = 100;

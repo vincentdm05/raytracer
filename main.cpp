@@ -33,27 +33,8 @@ Vec3 getColour(const Ray &r, const Scene &scene, int depth = 0)
 	return lerp(Vec3(0.619, 1, 0.694), Vec3(1, 0.639, 0.619), background);
 }
 
-void printTestImage()
+void printImage(const Scene &scene, const Camera &camera)
 {
-	Camera camera(Vec3(-2.0, -1.0, -1.0), Vec3(4.0, 0.0, 0.0), Vec3(0.0, 2.0, 0.0), Vec3(0, 0, 0));
-
-	Lambertian material0(Vec3(0.8, 0.3, 0.3));
-	Metal material1(Vec3(0.8, 0.8, 0.0), 0.3);
-	Metal material2(Vec3(0.8, 0.6, 0.2));
-	Dielectric material3(1.5);
-
-	Sphere sphere(Vec3(0, 0, -1), 0.5, &material0);
-	Sphere ground(Vec3(0, -100.5, -1), 100, &material1);
-	Sphere metallicSphere(Vec3(1, 0, -1), 0.5, &material2);
-	Sphere transparentSphere(Vec3(-1, 0, -1), 0.5, &material3);
-	Sphere transparentSphereHollow(Vec3(-1, 0, -1), -0.45, &material3);
-	Scene scene;
-	scene.add(sphere);
-	scene.add(ground);
-	scene.add(metallicSphere);
-	scene.add(transparentSphere);
-	scene.add(transparentSphereHollow);
-
 	int nx = 200;
 	int ny = 100;
 	int ns = 100;
@@ -65,8 +46,8 @@ void printTestImage()
 			Vec3 colour;
 			for (int s = 0; s < ns; s++)
 			{
-				Real u = (col + drand48()) / nx;
-				Real v = (row + drand48()) / ny;
+				Real u = Real(col + drand48()) / nx;
+				Real v = Real(row + drand48()) / ny;
 				Ray r = camera.getRay(u, v);
 				colour += getColour(r, scene);
 			}
@@ -130,11 +111,62 @@ void testRay()
 	std::cout << ray.to(2) << std::endl;
 }
 
+void testScene0()
+{
+	Camera camera(Vec3(-2.0, -1.0, -1.0), Vec3(4.0, 0.0, 0.0), Vec3(0.0, 2.0, 0.0), Vec3(0, 0, 0));
+
+	Lambertian material0(Vec3(0.8, 0.3, 0.3));
+	Metal material1(Vec3(0.8, 0.8, 0.0), 0.3);
+	Metal material2(Vec3(0.8, 0.6, 0.2));
+	Dielectric material3(1.5);
+
+	Sphere sphere(Vec3(0, 0, -1), 0.5, material0);
+	Sphere ground(Vec3(0, -100.5, -1), 100, material1);
+	Sphere metallicSphere(Vec3(1, 0, -1), 0.5, material2);
+	Sphere transparentSphere(Vec3(-1, 0, -1), 0.5, material3);
+	Sphere transparentSphereHollow(Vec3(-1, 0, -1), -0.45, material3);
+
+	Scene scene;
+	scene.add(sphere);
+	scene.add(ground);
+	scene.add(metallicSphere);
+	scene.add(transparentSphere);
+	scene.add(transparentSphereHollow);
+
+	printImage(scene, camera);
+}
+
+void testSceneRef()
+{
+	Camera camera(Vec3(-2.0, -1.0, -1.0), Vec3(4.0, 0.0, 0.0), Vec3(0.0, 2.0, 0.0), Vec3(0, 0, 0));
+
+	Lambertian material0(Vec3(0.1, 0.2, 0.5));
+	Lambertian material1(Vec3(0.8, 0.8, 0.0));
+	Metal material2(Vec3(0.8, 0.6, 0.2));
+	Dielectric material3(1.5);
+
+	Sphere sphere0(Vec3(0, 0, -1), 0.5, material0);
+	Sphere sphere1(Vec3(0, -100.5, -1), 100, material1);
+	Sphere sphere2(Vec3(1, 0, -1), 0.5, material2);
+	Sphere sphere3(Vec3(-1, 0, -1), 0.5, material3);
+	Sphere sphere4(Vec3(-1, 0, -1), -0.45, material3);
+
+	Scene scene;
+	scene.add(sphere0);
+	scene.add(sphere1);
+	scene.add(sphere2);
+	scene.add(sphere3);
+	scene.add(sphere4);
+
+	printImage(scene, camera);
+}
+
 int main()
 {
 	// testVec3();
 	// testRay();
-	printTestImage();
+	// testSceneRef();
+	testScene0();
 
 	return 0;
 }

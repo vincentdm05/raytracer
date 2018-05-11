@@ -12,7 +12,7 @@ struct HitRecord
 	Real t;
 	Vec3 normal;
 	Vec3 point;
-	Material *material;
+	const Material *material;
 };
 
 class Hitable

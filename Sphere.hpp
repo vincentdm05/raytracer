@@ -11,11 +11,11 @@ class Sphere : public Hitable
 private:
 	Vec3 center;
 	Real radius = 1.0;
-	Material *material = nullptr;
+	const Material *material = nullptr;
 
 public:
 	Sphere() {}
-	Sphere(const Vec3 &_center, Real _radius, Material *_material) { center = _center; radius = _radius; material = _material; }
+	Sphere(const Vec3 &_center, Real _radius, const Material &_material) { center = _center; radius = _radius; material = &_material; }
 
 	virtual bool hit(const Ray &r, Real minDist, Real maxDist, HitRecord &rec) const;
 };

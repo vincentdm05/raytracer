@@ -16,7 +16,7 @@ private:
 public:
 	Camera(const Vec3 &_bottomLeft, const Vec3 &_horizontal, const Vec3 &_vertical, const Vec3 &_origin);
 	
-	Ray getRay(Real u, Real v);
+	Ray getRay(Real u, Real v) const;
 };
 
 Camera::Camera(const Vec3 &_bottomLeft, const Vec3 &_horizontal, const Vec3 &_vertical, const Vec3 &_origin)
@@ -27,7 +27,7 @@ Camera::Camera(const Vec3 &_bottomLeft, const Vec3 &_horizontal, const Vec3 &_ve
 	origin = _origin;
 }
 
-Ray Camera::getRay(Real u, Real v)
+Ray Camera::getRay(Real u, Real v) const
 {
 	return Ray(origin, bottomLeft + u * horizontal + v * vertical);
 }

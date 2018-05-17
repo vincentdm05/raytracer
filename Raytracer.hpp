@@ -13,13 +13,28 @@
 #include <limits>
 #include <random>
 
+struct Background
+{
+	Vec3 bottom;
+	Vec3 top;
+
+	Background() {}
+	Background(const Vec3 &_bottom, const Vec3 &_top) { bottom = _bottom; top = _top; }
+
+	Background &operator=(const Background &other) { if (this != &other) { bottom = other.bottom; top = other.top; }; return *this; }
+};
+
 class Raytracer
 {
+private:
+	Background background;
+
 public:
 	Raytracer() {}
 
 	Vec3 getColour(const Ray &r, const Scene &scene, int depth = 0) const;
 	void printImage(const Scene &scene, const Camera &camera) const;
+	void setBackground(const Background &_background) { background = _background; }
 };
 
 Vec3 Raytracer::getColour(const Ray &r, const Scene &scene, int depth) const
@@ -36,9 +51,8 @@ Vec3 Raytracer::getColour(const Ray &r, const Scene &scene, int depth) const
 	}
 
 	Vec3 d = normalize(r.direction());
-	Real background = 0.5 * (d.y + 1.0);
-	// return lerp(Vec3(1, 1, 1), Vec3(0.5, 0.7, 1.0), background);
-	return lerp(Vec3(0.619, 1, 0.694), Vec3(1, 0.639, 0.619), background);
+	Real altitude = 0.5 * (d.y + 1.0);
+	return lerp(background.bottom, background.top, altitude);
 }
 
 void Raytracer::printImage(const Scene &scene, const Camera &camera) const

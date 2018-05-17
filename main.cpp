@@ -1,62 +1,17 @@
 #include "Common.hpp"
 
-#include "Dielectric.hpp"
 #include "Camera.hpp"
+#include "Dielectric.hpp"
 #include "Lambertian.hpp"
 #include "Math.hpp"
 #include "Metal.hpp"
 #include "Ray.hpp"
+#include "Raytracer.hpp"
 #include "Scene.hpp"
 #include "Sphere.hpp"
 #include "Vec3.hpp"
 
 #include <iostream>
-#include <limits>
-#include <random>
-
-Vec3 getColour(const Ray &r, const Scene &scene, int depth = 0)
-{
-	HitRecord rec;
-	if (scene.hit(r, 0.001, std::numeric_limits<Real>::max(), rec))
-	{
-		Ray scattered;
-		Vec3 attenuation;
-		if (depth < 50 && rec.material && rec.material->scatter(r, rec, attenuation, scattered))
-			return getColour(scattered, scene, depth + 1) * attenuation;
-		else
-			return Vec3();
-	}
-
-	Vec3 d = normalize(r.direction());
-	Real background = 0.5 * (d.y + 1.0);
-	// return lerp(Vec3(1, 1, 1), Vec3(0.5, 0.7, 1.0), background);
-	return lerp(Vec3(0.619, 1, 0.694), Vec3(1, 0.639, 0.619), background);
-}
-
-void printImage(const Scene &scene, const Camera &camera)
-{
-	int nx = 200;
-	int ny = 100;
-	int ns = 100;
-	std::cout << "P3\n" << nx << " " << ny << "\n255\n";
-	for (int row = ny - 1; row >= 0; row--)
-	{
-		for (int col = 0; col < nx; col++)
-		{
-			Vec3 colour;
-			for (int s = 0; s < ns; s++)
-			{
-				Real u = Real(col + drand48()) / nx;
-				Real v = Real(row + drand48()) / ny;
-				Ray r = camera.getRay(u, v);
-				colour += getColour(r, scene);
-			}
-			// gamma 2 correction
-			colour = 255.99 * sqrt(colour / ns);
-			std::cout << int(colour.r) << " " << int(colour.g) << " " << int(colour.b) << "\n";
-		}
-	}
-}
 
 void testVec3()
 {
@@ -105,15 +60,15 @@ void testRay()
 	std::cout << r1.origin() << " " << r1.direction() << std::endl;
 	std::cout << r1.to(2) << std::endl;
 
-	Camera camera(Vec3(-2.0, -1.0, -1.0), Vec3(4.0, 0.0, 0.0), Vec3(0.0, 2.0, 0.0), Vec3(0, 0, 0));
+	Camera camera(Vec3(0, 0, 0), Vec3(0, 0, -1), Vec3(0, 1, 0), 90, Viewport(200, 100));
 	Ray ray = camera.getRay(0.5, 0.5);
 	std::cout << ray.origin() << " " << ray.direction() << std::endl;
 	std::cout << ray.to(2) << std::endl;
 }
 
-void testScene0()
+void testSceneMaterials(const Raytracer &raytracer)
 {
-	Camera camera(Vec3(-2.0, -1.0, -1.0), Vec3(4.0, 0.0, 0.0), Vec3(0.0, 2.0, 0.0), Vec3(0, 0, 0));
+	Camera camera(Vec3(0, 0, 0), Vec3(0, 0, -1), Vec3(0, 1, 0), 90, Viewport(200, 100));
 
 	Lambertian material0(Vec3(0.8, 0.3, 0.3));
 	Metal material1(Vec3(0.8, 0.8, 0.0), 0.3);
@@ -133,12 +88,36 @@ void testScene0()
 	scene.add(transparentSphere);
 	scene.add(transparentSphereHollow);
 
-	printImage(scene, camera);
+	raytracer.printImage(scene, camera);
 }
 
-void testSceneRef()
+void testScenePositionableCamera(const Raytracer &raytracer)
 {
-	Camera camera(Vec3(-2.0, -1.0, -1.0), Vec3(4.0, 0.0, 0.0), Vec3(0.0, 2.0, 0.0), Vec3(0, 0, 0));
+	Camera camera(Vec3(0, 0, 0), Vec3(0, 0, -1), Vec3(0, 1, 0), 90, Viewport(200, 100));
+
+	Lambertian material0(Vec3(0, 0, 1));
+	Lambertian material1(Vec3(1, 0, 0));
+
+	Real R = cos(M_PI / 4.0);
+	Sphere sphere0(Vec3(-R, 0, -1), R, material0);
+	Sphere sphere1(Vec3(R, 0, -1), R, material1);
+
+	Scene scene;
+	scene.add(sphere0);
+	scene.add(sphere1);
+
+	raytracer.printImage(scene, camera);
+}
+
+void testSceneFinal(const Raytracer &raytracer)
+{
+	// Put the camera inside an inverted transparent sphere
+	Camera camera(Vec3(-2.0, 2.0, 1.0), Vec3(1.0, -1.0, -1.0), Vec3(0.0, 1.0, 0.0), 90, Viewport(200, 100));
+}
+
+void testSceneRef(const Raytracer &raytracer)
+{
+	Camera camera(Vec3(-2.0, 2.0, 1.0), Vec3(1.0, -1.0, -1.0), Vec3(0.0, 1.0, 0.0), 90, Viewport(200, 100));
 
 	Lambertian material0(Vec3(0.1, 0.2, 0.5));
 	Lambertian material1(Vec3(0.8, 0.8, 0.0));
@@ -158,15 +137,18 @@ void testSceneRef()
 	scene.add(sphere3);
 	scene.add(sphere4);
 
-	printImage(scene, camera);
+	raytracer.printImage(scene, camera);
 }
 
 int main()
 {
+	Raytracer raytracer;
+
 	// testVec3();
 	// testRay();
-	// testSceneRef();
-	testScene0();
+	// testSceneMaterials(raytracer);
+	// testScenePositionableCamera(raytracer);
+	testSceneRef(raytracer);
 
 	return 0;
 }

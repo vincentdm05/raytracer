@@ -4,17 +4,7 @@
 
 #include "Ray.hpp"
 #include "Vec3.hpp"
-
-struct Viewport
-{
-	uint width;
-	uint height;
-
-	Viewport() { width = 1; height = 1; }
-	Viewport(uint w, uint h) { width = w; height = h; }
-
-	Viewport &operator=(const Viewport &other) { if (this != &other) { width = other.width; height = other.height; }; return *this; }
-};
+#include "Viewport.hpp"
 
 class Camera
 {
@@ -27,22 +17,19 @@ private:
 
 public:
 	Camera(const Vec3 &_position, const Vec3 &_direction, const Vec3 &_up, Real fovY, const Viewport &_viewport);
-
-	const Viewport &getViewport() const { return viewport; }
 	
 	Ray getRay(Real u, Real v) const;
+	const Viewport &getViewport() const { return viewport; }
 };
 
 Camera::Camera(const Vec3 &_position, const Vec3 &_direction, const Vec3 &_up, Real fovY, const Viewport &_viewport)
 {
-	position = _position;
-
 	viewport = _viewport;
-	Real aspect = Real(viewport.width) / viewport.height;
+	position = _position;
 
 	Real theta = fovY * M_PI / 180.0;
 	Real halfHeight = tan(theta * 0.5);
-	Real halfWidth = halfHeight * aspect;
+	Real halfWidth = halfHeight * viewport.aspectRatio();
 
 	Vec3 direction = normalize(_direction);
 	Vec3 right = normalize(cross(direction, _up));

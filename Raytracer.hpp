@@ -8,6 +8,7 @@
 #include "Ray.hpp"
 #include "Scene.hpp"
 #include "Vec3.hpp"
+#include "Viewport.hpp"
 
 #include <iostream>
 #include <limits>
@@ -31,6 +32,7 @@ private:
 
 public:
 	Raytracer() {}
+	Raytracer(const Background &_background) { background = _background; }
 
 	Vec3 getColour(const Ray &r, const Scene &scene, int depth = 0) const;
 	void printImage(const Scene &scene, const Camera &camera) const;
@@ -59,8 +61,8 @@ void Raytracer::printImage(const Scene &scene, const Camera &camera) const
 {
 	const Viewport &viewport = camera.getViewport();
 
-	int nx = viewport.width;
-	int ny = viewport.height;
+	int nx = viewport.width();
+	int ny = viewport.height();
 	int ns = 100;
 	std::cout << "P3\n" << nx << " " << ny << "\n255\n";
 	for (int row = ny - 1; row >= 0; row--)

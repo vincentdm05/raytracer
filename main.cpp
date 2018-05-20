@@ -142,9 +142,8 @@ void testSceneRef(const Raytracer &raytracer)
 
 int main()
 {
-	Raytracer raytracer;
-	raytracer.setBackground(Background(Vec3(1, 1, 1), Vec3(0.5, 0.7, 1.0)));
-	// raytracer.setBackground(Background(Vec3(0.619, 1, 0.694), Vec3(1, 0.639, 0.619)));
+	Raytracer raytracer(Background(Vec3(1, 1, 1), Vec3(0.5, 0.7, 1.0)));
+	// Raytracer raytracer(Background(Vec3(0.619, 1, 0.694), Vec3(1, 0.639, 0.619)));
 
 	// testVec3();
 	// testRay();

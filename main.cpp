@@ -109,12 +109,6 @@ void testScenePositionableCamera(const Raytracer &raytracer)
 	raytracer.printImage(scene, camera);
 }
 
-void testSceneFinal(const Raytracer &raytracer)
-{
-	// Put the camera inside an inverted transparent sphere
-	Camera camera(Vec3(-2.0, 2.0, 1.0), Vec3(1.0, -1.0, -1.0), Vec3(0.0, 1.0, 0.0), 90, Viewport(200, 100));
-}
-
 void testSceneRef(const Raytracer &raytracer)
 {
 	Camera camera(Vec3(-2.0, 2.0, 1.0), Vec3(1.0, -1.0, -1.0), Vec3(0.0, 1.0, 0.0), 90, Viewport(200, 100));

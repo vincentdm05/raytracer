@@ -60,7 +60,7 @@ void testRay()
 	std::cout << r1.origin() << " " << r1.direction() << std::endl;
 	std::cout << r1.to(2) << std::endl;
 
-	Camera camera(Vec3(0, 0, 0), Vec3(0, 0, -1), Vec3(0, 1, 0), 90, Viewport(200, 100));
+	Camera camera(Vec3(0, 0, 0), Vec3(0, 0, -1), Vec3(0, 1, 0), 90, Viewport(200, 100), 2.0, 2.0);
 	Ray ray = camera.getRay(0.5, 0.5);
 	std::cout << ray.origin() << " " << ray.direction() << std::endl;
 	std::cout << ray.to(2) << std::endl;
@@ -68,7 +68,7 @@ void testRay()
 
 void testSceneMaterials(const Raytracer &raytracer)
 {
-	Camera camera(Vec3(0, 0, 0), Vec3(0, 0, -1), Vec3(0, 1, 0), 90, Viewport(200, 100));
+	Camera camera(Vec3(0, 0, 0), Vec3(0, 0, -1), Vec3(0, 1, 0), 90, Viewport(200, 100), 2.0, 2.0);
 
 	Lambertian material0(Vec3(0.8, 0.3, 0.3));
 	Metal material1(Vec3(0.8, 0.8, 0.0), 0.3);
@@ -93,7 +93,7 @@ void testSceneMaterials(const Raytracer &raytracer)
 
 void testScenePositionableCamera(const Raytracer &raytracer)
 {
-	Camera camera(Vec3(0, 0, 0), Vec3(0, 0, -1), Vec3(0, 1, 0), 90, Viewport(200, 100));
+	Camera camera(Vec3(0, 0, 0), Vec3(0, 0, -1), Vec3(0, 1, 0), 90, Viewport(200, 100), 2.0, 2.0);
 
 	Lambertian material0(Vec3(0, 0, 1));
 	Lambertian material1(Vec3(1, 0, 0));
@@ -111,14 +111,17 @@ void testScenePositionableCamera(const Raytracer &raytracer)
 
 void testSceneRef(const Raytracer &raytracer)
 {
-	Camera camera(Vec3(-2.0, 2.0, 1.0), Vec3(1.0, -1.0, -1.0), Vec3(0.0, 1.0, 0.0), 90, Viewport(200, 100));
+	Vec3 cameraPosition(3.0, 3.0, 2.0);
+	Vec3 focusPosition(0, 0, -1);
+	Vec3 focusDirection = focusPosition - cameraPosition;
+	Camera camera(cameraPosition, focusDirection, Vec3(0.0, 1.0, 0.0), 20, Viewport(200, 100), 2.0, focusDirection.length());
 
 	Lambertian material0(Vec3(0.1, 0.2, 0.5));
 	Lambertian material1(Vec3(0.8, 0.8, 0.0));
 	Metal material2(Vec3(0.8, 0.6, 0.2));
 	Dielectric material3(1.5);
 
-	Sphere sphere0(Vec3(0, 0, -1), 0.5, material0);
+	Sphere sphere0(focusPosition, 0.5, material0);
 	Sphere sphere1(Vec3(0, -100.5, -1), 100, material1);
 	Sphere sphere2(Vec3(1, 0, -1), 0.5, material2);
 	Sphere sphere3(Vec3(-1, 0, -1), 0.5, material3);

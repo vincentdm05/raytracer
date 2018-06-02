@@ -18,5 +18,7 @@ struct HitRecord
 class Hitable
 {
 public:
+	virtual ~Hitable() {}
+
 	virtual bool hit(const Ray &r, Real minDist, Real maxDist, HitRecord &rec) const = 0;
 };

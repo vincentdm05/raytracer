@@ -30,6 +30,8 @@ class Raytracer
 private:
 	Background background;
 
+	Vec3 gammaCorrect(const Vec3 &colour) const;
+
 public:
 	Raytracer() {}
 	Raytracer(const Background &_background) { background = _background; }
@@ -38,6 +40,12 @@ public:
 	void printImage(const Scene &scene, const Camera &camera) const;
 	void setBackground(const Background &_background) { background = _background; }
 };
+
+Vec3 Raytracer::gammaCorrect(const Vec3 &colour) const
+{
+	// Gamma 2 correction
+	return sqrt(colour);
+}
 
 Vec3 Raytracer::getColour(const Ray &r, const Scene &scene, int depth) const
 {
@@ -77,8 +85,7 @@ void Raytracer::printImage(const Scene &scene, const Camera &camera) const
 				Ray r = camera.getRay(u, v);
 				colour += getColour(r, scene);
 			}
-			// gamma 2 correction
-			colour = 255.99 * sqrt(colour / ns);
+			colour = 255.99 * gammaCorrect(colour);
 			std::cout << int(colour.r) << " " << int(colour.g) << " " << int(colour.b) << "\n";
 		}
 	}

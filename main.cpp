@@ -11,6 +11,7 @@
 #include "Sphere.hpp"
 #include "Vec3.hpp"
 
+#include <chrono>
 #include <iostream>
 
 void testVec3()
@@ -210,6 +211,13 @@ int main()
 	// testScenePositionableCamera(raytracer);
 	// testSceneRef(raytracer);
 	testSceneRandom(raytracer);
+
+	// raytracer.setOutputEnabled(false);
+	// auto start = std::chrono::system_clock::now();
+	// testSceneRandom(raytracer);
+	// auto stop = std::chrono::system_clock::now();
+	// std::chrono::milliseconds delta = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+	// std::cout << "Duration: " << delta.count() << "ms" << std::endl;
 
 	return 0;
 }

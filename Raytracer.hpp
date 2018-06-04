@@ -30,6 +30,7 @@ class Raytracer
 {
 private:
 	Background background;
+	bool outputEnabled = true;
 
 	Vec3 gammaCorrect(const Vec3 &colour) const;
 
@@ -41,6 +42,7 @@ public:
 	Vec3 samplePixel(const Camera &camera, const Scene &scene, int col, int row, const Viewport &vp, uint nSamples = 1) const;
 	void printImage(const Scene &scene, const Camera &camera) const;
 	void setBackground(const Background &_background) { background = _background; }
+	void setOutputEnabled(bool value) { outputEnabled = value; }
 };
 
 Vec3 Raytracer::gammaCorrect(const Vec3 &colour) const
@@ -91,7 +93,8 @@ void Raytracer::printImage(const Scene &scene, const Camera &camera) const
 
 	int nx = viewport.width();
 	int ny = viewport.height();
-	std::cout << "P3\n" << nx << " " << ny << "\n255\n";
+	if (outputEnabled)
+		std::cout << "P3\n" << nx << " " << ny << "\n255\n";
 	for (int row = ny - 1; row >= 0; row--)
 	{
 		for (int col = 0; col < nx; col++)
@@ -105,7 +108,9 @@ void Raytracer::printImage(const Scene &scene, const Camera &camera) const
 			colour /= nThreads;
 
 			colour = 255.99 * gammaCorrect(colour);
-			std::cout << int(colour.r) << " " << int(colour.g) << " " << int(colour.b) << "\n";
+
+			if (outputEnabled)
+				std::cout << int(colour.r) << " " << int(colour.g) << " " << int(colour.b) << "\n";
 		}
 	}
 }

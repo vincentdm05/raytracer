@@ -1,2 +1,4 @@
 *.ppm
 bin/
+*.sublime-project
+*.sublime-workspace

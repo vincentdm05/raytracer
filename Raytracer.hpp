@@ -31,6 +31,8 @@ class Raytracer
 private:
 	Background background;
 	bool outputEnabled = true;
+	uint maxDepth = 50;
+	uint samplesPerPixel = 100;
 
 	Vec3 gammaCorrect(const Vec3 &colour) const;
 
@@ -43,6 +45,8 @@ public:
 	void printImage(const Scene &scene, const Camera &camera) const;
 	void setBackground(const Background &_background) { background = _background; }
 	void setOutputEnabled(bool value) { outputEnabled = value; }
+	void setMaxDepth(uint d) { maxDepth = d; }
+	void setSamplesPerPixel(uint n) { samplesPerPixel = n; }
 };
 
 Vec3 Raytracer::gammaCorrect(const Vec3 &colour) const
@@ -58,7 +62,7 @@ Vec3 Raytracer::getColour(const Ray &r, const Scene &scene, int depth) const
 	{
 		Ray scattered;
 		Vec3 attenuation;
-		if (depth < 50 && rec.material && rec.material->scatter(r, rec, attenuation, scattered))
+		if (depth < maxDepth && rec.material && rec.material->scatter(r, rec, attenuation, scattered))
 			return getColour(scattered, scene, depth + 1) * attenuation;
 		else
 			return Vec3();
@@ -86,8 +90,7 @@ void Raytracer::printImage(const Scene &scene, const Camera &camera) const
 {
 	const int nThreads = 4;
 	std::future<Vec3> futures[nThreads];
-	int ns = 100;
-	int samplesPerThread = ns / nThreads;
+	int samplesPerThread = samplesPerPixel / nThreads;
 
 	const Viewport &viewport = camera.getViewport();
 

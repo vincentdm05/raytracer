@@ -68,7 +68,7 @@ Vec3 Raytracer::getColour(const Ray &r, const Scene &scene, int depth) const
 			return Vec3();
 	}
 
-	Vec3 d = normalize(r.direction());
+	Vec3 d = r.direction();
 	Real altitude = 0.5 * (d.y + 1.0);
 	return lerp(background.bottom, background.top, altitude);
 }

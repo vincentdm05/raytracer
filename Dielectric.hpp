@@ -21,7 +21,7 @@ bool Dielectric::scatter(const Ray &rIn, const HitRecord &hr, Vec3 &attenuation,
 {
 	attenuation = Vec3(1, 1, 1);
 
-	Vec3 v = normalize(rIn.direction());
+	Vec3 v = rIn.direction();
 	Vec3 n;
 
 	Real refractiveIndexRatio;

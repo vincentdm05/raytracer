@@ -21,7 +21,7 @@ public:
 
 bool Metal::scatter(const Ray &rIn, const HitRecord &hr, Vec3 &attenuation, Ray &scattered) const
 {
-	Vec3 reflected = reflect(normalize(rIn.direction()), hr.normal);
+	Vec3 reflected = reflect(rIn.direction(), hr.normal);
 	if (roughness)
 		reflected += roughness * sampleUnitSphere();
 	scattered = Ray(hr.point, reflected);

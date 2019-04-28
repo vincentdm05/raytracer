@@ -2,6 +2,7 @@
 
 #include "Common.hpp"
 
+#include "Background.hpp"
 #include "Hitable.hpp"
 
 #include <vector>
@@ -9,6 +10,7 @@
 class Scene : public Hitable
 {
 private:
+	Background bg;
 	std::vector<const Hitable *> hitables;
 
 public:
@@ -18,6 +20,8 @@ public:
 
 	virtual bool hit(const Ray &r, Real minDist, Real maxDist, HitRecord &rec) const;
 
+	void setBackground(const Background &_background) { bg = _background; }
+	const Background &background() const { return bg; }
 	void add(const Hitable &hitable) { hitables.push_back(&hitable); }
 };
 

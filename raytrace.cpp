@@ -84,6 +84,7 @@ void testSceneMaterials(const Raytracer &raytracer)
 	Sphere transparentSphereHollow(Vec3(-1, 0, -1), -0.45, material3);
 
 	Scene scene;
+	scene.setBackground(Background(Vec3(1, 1, 1), Vec3(0.5, 0.7, 1.0)));
 	scene.add(sphere);
 	scene.add(ground);
 	scene.add(metallicSphere);
@@ -105,6 +106,7 @@ void testScenePositionableCamera(const Raytracer &raytracer)
 	Sphere sphere1(Vec3(R, 0, -1), R, material1);
 
 	Scene scene;
+	scene.setBackground(Background(Vec3(0.619, 1, 0.694), Vec3(1, 0.639, 0.619)));
 	scene.add(sphere0);
 	scene.add(sphere1);
 
@@ -130,6 +132,7 @@ void testSceneRef(const Raytracer &raytracer)
 	Sphere sphere4(Vec3(-1, 0, -1), -0.45, material3);
 
 	Scene scene;
+	scene.setBackground(Background(Vec3(0.619, 1, 0.694), Vec3(1, 0.639, 0.619)));
 	scene.add(sphere0);
 	scene.add(sphere1);
 	scene.add(sphere2);
@@ -188,6 +191,7 @@ void testSceneRandom(const Raytracer &raytracer)
 	objects.push_back(new Sphere(Vec3(0, 1, 0), 1, *materials[materialIndex++]));
 
 	Scene scene;
+	scene.setBackground(Background(Vec3(0.619, 1, 0.694), Vec3(1, 0.639, 0.619)));
 	for (Hitable *hitable : objects)
 		scene.add(*hitable);
 
@@ -203,8 +207,7 @@ void testSceneRandom(const Raytracer &raytracer)
 
 int main()
 {
-	// Raytracer raytracer(Background(Vec3(1, 1, 1), Vec3(0.5, 0.7, 1.0)));
-	Raytracer raytracer(Background(Vec3(0.619, 1, 0.694), Vec3(1, 0.639, 0.619)));
+	Raytracer raytracer;
 
 	// testVec3();
 	// testRay();

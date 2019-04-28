@@ -19,7 +19,6 @@
 class Raytracer
 {
 private:
-	Background background;
 	bool outputEnabled = true;
 	uint maxDepth = 50;
 	uint samplesPerPixel = 100;
@@ -28,12 +27,10 @@ private:
 
 public:
 	Raytracer() {}
-	Raytracer(const Background &_background) { background = _background; }
 
 	Vec3 getColour(const Ray &r, const Scene &scene, int depth = 0) const;
 	Vec3 samplePixel(const Camera &camera, const Scene &scene, int col, int row, const Viewport &vp, uint nSamples = 1) const;
 	void printImage(const Scene &scene, const Camera &camera) const;
-	void setBackground(const Background &_background) { background = _background; }
 	void setOutputEnabled(bool value) { outputEnabled = value; }
 	void setMaxDepth(uint d) { maxDepth = d; }
 	void setSamplesPerPixel(uint n) { samplesPerPixel = n; }
@@ -58,7 +55,7 @@ Vec3 Raytracer::getColour(const Ray &r, const Scene &scene, int depth) const
 			return Vec3();
 	}
 
-	return background.sample(r.direction());
+	return scene.background().sample(r.direction());
 }
 
 Vec3 Raytracer::samplePixel(const Camera &camera, const Scene &scene, int col, int row, const Viewport &vp, uint nSamples) const

@@ -1,5 +1,6 @@
 #include "Common.hpp"
 
+#include "Background.hpp"
 #include "Camera.hpp"
 #include "Dielectric.hpp"
 #include "Lambertian.hpp"

@@ -2,6 +2,7 @@
 
 #include "Common.hpp"
 
+#include "Background.hpp"
 #include "Camera.hpp"
 #include "Material.hpp"
 #include "Math.hpp"
@@ -14,25 +15,6 @@
 #include <iostream>
 #include <limits>
 #include <random>
-
-struct Background
-{
-	Vec3 bottom;
-	Vec3 top;
-
-	Background() {}
-	Background(const Vec3 &_bottom, const Vec3 &_top) { bottom = _bottom; top = _top; }
-
-	Background &operator=(const Background &other) { if (this != &other) { bottom = other.bottom; top = other.top; }; return *this; }
-
-	Vec3 sample(const Vec3 &direction) const;
-};
-
-Vec3 Background::sample(const Vec3 &direction) const
-{
-	Real altitude = 0.5 * (direction.y + 1.0);
-	return lerp(bottom, top, altitude);
-}
 
 class Raytracer
 {

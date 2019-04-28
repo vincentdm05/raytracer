@@ -24,7 +24,15 @@ struct Background
 	Background(const Vec3 &_bottom, const Vec3 &_top) { bottom = _bottom; top = _top; }
 
 	Background &operator=(const Background &other) { if (this != &other) { bottom = other.bottom; top = other.top; }; return *this; }
+
+	Vec3 sample(const Vec3 &direction) const;
 };
+
+Vec3 Background::sample(const Vec3 &direction) const
+{
+	Real altitude = 0.5 * (direction.y + 1.0);
+	return lerp(bottom, top, altitude);
+}
 
 class Raytracer
 {
@@ -68,9 +76,7 @@ Vec3 Raytracer::getColour(const Ray &r, const Scene &scene, int depth) const
 			return Vec3();
 	}
 
-	Vec3 d = r.direction();
-	Real altitude = 0.5 * (d.y + 1.0);
-	return lerp(background.bottom, background.top, altitude);
+	return background.sample(r.direction());
 }
 
 Vec3 Raytracer::samplePixel(const Camera &camera, const Scene &scene, int col, int row, const Viewport &vp, uint nSamples) const

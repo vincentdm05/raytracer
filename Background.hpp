@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Common.hpp"
+
 #include "Math.hpp"
 #include "Vec3.hpp"
 

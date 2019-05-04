@@ -174,7 +174,7 @@ inline Vec3 operator+(Real c, const Vec3 &v)
 
 inline Vec3 operator-(Real c, const Vec3 &v)
 {
-	return v - c;
+	return -v + c;
 }
 
 inline Vec3 operator*(Real c, const Vec3 &v)

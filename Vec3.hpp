@@ -27,6 +27,8 @@ public:
 	inline Vec3 &operator=(const Vec3 &v) { if (this != &v) { x = v.x; y = v.y; z = v.z; }; return *this; }
 	inline Vec3 &operator=(Vec3 && v) { x = std::move(v.x); y = std::move(v.y); z = std::move(v.z); return *this; }
 
+	inline bool operator==(const Vec3 &v) const { return x == v.x && y == v.y && z == v.z; }
+
 	inline const Vec3 &operator+() const { return *this; }
 	inline Vec3 operator-() const { return Vec3(-x, -y, -z); }
 	inline Real operator[](uint i) const { return e[i % 3]; }
@@ -112,8 +114,10 @@ inline Vec3 &Vec3::operator/=(Real c)
 
 inline Vec3 &Vec3::normalize()
 {
-	Real invl = 1 / length();
-	*this *= invl;
+	Real l = length();
+	if (l == 0)
+		throw "Zero vector can't be normalized";
+	*this /= l;
 	return *this;
 }
 
@@ -201,8 +205,10 @@ inline Vec3 cross(const Vec3 &a, const Vec3 &b)
 
 inline Vec3 normalize(const Vec3 &v)
 {
-	Real invl = 1 / v.length();
-	return v * invl;
+	Real l = v.length();
+	if (l == 0)
+		throw "Zero vector can't be normalized";
+	return v / l;
 }
 
 inline Vec3 sqrt(const Vec3 &v)

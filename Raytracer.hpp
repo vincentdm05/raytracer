@@ -28,7 +28,7 @@ private:
 public:
 	Raytracer() {}
 
-	Vec3 getColour(const Ray &r, const Scene &scene, int depth = 0) const;
+	Vec3 getColour(const Ray &r, const Scene &scene, uint depth = 0) const;
 	Vec3 samplePixel(const Camera &camera, const Scene &scene, int col, int row, const Viewport &vp, uint nSamples = 1) const;
 	void printImage(const Scene &scene, const Camera &camera) const;
 	void setOutputEnabled(bool value) { outputEnabled = value; }
@@ -42,7 +42,7 @@ Vec3 Raytracer::gammaCorrect(const Vec3 &colour) const
 	return sqrt(colour);
 }
 
-Vec3 Raytracer::getColour(const Ray &r, const Scene &scene, int depth) const
+Vec3 Raytracer::getColour(const Ray &r, const Scene &scene, uint depth) const
 {
 	HitRecord rec;
 	if (scene.hit(r, 0.001, std::numeric_limits<Real>::max(), rec))

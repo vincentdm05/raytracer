@@ -73,7 +73,7 @@ Vec3 Raytracer::samplePixel(const Camera &camera, const Scene &scene, int col, i
 
 void Raytracer::printImage(const Scene &scene, const Camera &camera) const
 {
-	const int nThreads = 4;
+	const int nThreads = 1;
 	std::future<Vec3> futures[nThreads];
 	int samplesPerThread = samplesPerPixel / nThreads;
 
@@ -88,12 +88,19 @@ void Raytracer::printImage(const Scene &scene, const Camera &camera) const
 		for (int col = 0; col < nx; col++)
 		{
 			Vec3 colour;
-			for (int s = 0; s < nThreads; s++)
-				futures[s] = std::async(std::launch::async, &Raytracer::samplePixel, this, std::ref(camera), std::ref(scene), col, row, std::ref(viewport), samplesPerThread);
+			if (nThreads > 1)
+			{
+				for (int s = 0; s < nThreads; s++)
+					futures[s] = std::async(std::launch::async, &Raytracer::samplePixel, this, std::ref(camera), std::ref(scene), col, row, std::ref(viewport), samplesPerThread);
 
-			for (int s = 0; s < nThreads; s++)
-				colour += futures[s].get();
-			colour /= nThreads;
+				for (int s = 0; s < nThreads; s++)
+					colour += futures[s].get();
+				colour /= nThreads;
+			}
+			else
+			{
+				colour = samplePixel(camera, scene, col, row, viewport, samplesPerPixel);
+			}
 
 			colour = 255.99 * gammaCorrect(colour);
 

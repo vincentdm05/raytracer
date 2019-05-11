@@ -20,10 +20,12 @@ public:
 
 	Vec3() { x = 0; y = 0; z = 0; }
 	Vec3(Real _x, Real _y, Real _z) { x = _x; y = _y; z = _z; }
-	Vec3(Vec3 && other) { x = std::move(other.x); y = std::move(other.y); z = std::move(other.z); }
 	Vec3(const Vec3 &other) { x = other.x; y = other.y; z = other.z; }
+	Vec3(Vec3 && other) { x = std::move(other.x); y = std::move(other.y); z = std::move(other.z); }
+	~Vec3() = default;
 
 	inline Vec3 &operator=(const Vec3 &v) { if (this != &v) { x = v.x; y = v.y; z = v.z; }; return *this; }
+	inline Vec3 &operator=(Vec3 && v) { x = std::move(v.x); y = std::move(v.y); z = std::move(v.z); return *this; }
 
 	inline const Vec3 &operator+() const { return *this; }
 	inline Vec3 operator-() const { return Vec3(-x, -y, -z); }

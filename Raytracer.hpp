@@ -63,8 +63,8 @@ Vec3 Raytracer::samplePixel(const Camera &camera, const Scene &scene, int col, i
 	Vec3 colour;
 	for (uint i = 0; i < nSamples; i++)
 	{
-		Real u = Real(col + drand48()) / vp.width();
-		Real v = Real(row + drand48()) / vp.height();
+		Real u = Real(col + uniformRand()) / vp.width();
+		Real v = Real(row + uniformRand()) / vp.height();
 		Ray r = camera.getRay(u, v);
 		colour += getColour(r, scene);
 	}

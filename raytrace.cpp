@@ -206,20 +206,20 @@ void testSceneRandom(const Raytracer &raytracer)
 	{
 		for (int j = arenaDimensions[2]; j < arenaDimensions[3]; j++)
 		{
-			Real materialChooser = drand48();
+			Real materialChooser = uniformRand();
 			if (materialChooser > 0.9)
 			{
-				materials.push_back(new Dielectric(1.2 + drand48() * 0.5));
+				materials.push_back(new Dielectric(1.2 + uniformRand() * 0.5));
 			}
 			else if (materialChooser > 0.6)
 			{
-				materials.push_back(new Metal(Vec3(drand48(), drand48(), drand48()), drand48()));
+				materials.push_back(new Metal(Vec3(uniformRand(), uniformRand(), uniformRand()), uniformRand()));
 			}
 			else
 			{
-				materials.push_back(new Lambertian(Vec3(drand48(), drand48(), drand48())));
+				materials.push_back(new Lambertian(Vec3(uniformRand(), uniformRand(), uniformRand())));
 			}
-			Vec3 spherePosition(i + drand48() * 2.0 - 1.0, 0.2 + drand48() * 0.2, j + drand48() * 2.0 - 1.0);
+			Vec3 spherePosition(i + uniformRand() * 2.0 - 1.0, 0.2 + uniformRand() * 0.2, j + uniformRand() * 2.0 - 1.0);
 			objects.push_back(new Sphere(spherePosition, 0.2, *materials[materialIndex++]));
 		}
 	}

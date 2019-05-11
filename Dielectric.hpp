@@ -44,7 +44,7 @@ bool Dielectric::scatter(const Ray &rIn, const HitRecord &hr, Vec3 &attenuation,
 	if (refract(v, n, refractiveIndexRatio, refracted))
 		reflectance = schlick(vDotN, refractiveIndex);
 
-	if (drand48() < reflectance)
+	if (uniformRand() < reflectance)
 	{
 		Vec3 reflected = reflect(v, n);
 		scattered = Ray(hr.point, reflected);

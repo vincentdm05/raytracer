@@ -14,5 +14,5 @@ with `./raytrace`
 Example usage (for mac):
 
 * If `bin/` doesn't exist yet: `mkdir bin`
-* `g++ -Wall -std=c++11 -o bin/raytrace raytrace.cpp && ./bin/raytrace > img.ppm && open img.ppm`
+* `g++ -O3 -Wall -std=c++11 -o bin/raytrace raytrace.cpp && ./bin/raytrace > img.ppm && open img.ppm`
 

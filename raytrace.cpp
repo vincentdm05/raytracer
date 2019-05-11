@@ -111,7 +111,7 @@ void testRay()
 
 void testSceneMaterials(const Raytracer &raytracer)
 {
-	Camera camera(Vec3(0, 0, 0), Vec3(0, 0, -1), Vec3(0, 1, 0), 90, Viewport(200, 100), 2.0, 2.0);
+	Camera camera(Vec3(0, 0, 0), Vec3(0, 0, -1), Vec3(0, 1, 0), 90, Viewport(200, 100), 0.25, 0.8);
 
 	Lambertian material0(Vec3(0.8, 0.3, 0.3));
 	Metal material1(Vec3(0.8, 0.8, 0.0), 0.3);
@@ -137,7 +137,7 @@ void testSceneMaterials(const Raytracer &raytracer)
 
 void testScenePositionableCamera(const Raytracer &raytracer)
 {
-	Camera camera(Vec3(0, 0, 0), Vec3(0, 0, -1), Vec3(0, 1, 0), 90, Viewport(200, 100), 2.0, 2.0);
+	Camera camera(Vec3(0, 0, 1), Vec3(0, 0, -1), Vec3(0, 1, 0), 45, Viewport(200, 100), 0.5, 2.0);
 
 	Lambertian material0(Vec3(0, 0, 1));
 	Lambertian material1(Vec3(1, 0, 0));

@@ -12,6 +12,7 @@
 #include "Sphere.hpp"
 #include "Vec3.hpp"
 
+#include <assert.h>
 #include <chrono>
 #include <iostream>
 

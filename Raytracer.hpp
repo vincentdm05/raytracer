@@ -7,6 +7,7 @@
 #include "Material.hpp"
 #include "Math.hpp"
 #include "Ray.hpp"
+#include "Sampling.hpp"
 #include "Scene.hpp"
 #include "Vec3.hpp"
 #include "Viewport.hpp"

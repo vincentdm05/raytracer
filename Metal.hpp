@@ -4,6 +4,7 @@
 
 #include "Material.hpp"
 #include "Math.hpp"
+#include "Sampling.hpp"
 
 class Metal : public Material
 {

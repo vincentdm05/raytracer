@@ -4,6 +4,7 @@
 
 #include "Math.hpp"
 #include "Ray.hpp"
+#include "Sampling.hpp"
 #include "Vec3.hpp"
 #include "Viewport.hpp"
 

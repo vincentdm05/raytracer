@@ -8,6 +8,7 @@
 #include "Metal.hpp"
 #include "Ray.hpp"
 #include "Raytracer.hpp"
+#include "Sampling.hpp"
 #include "Scene.hpp"
 #include "Sphere.hpp"
 #include "Vec3.hpp"

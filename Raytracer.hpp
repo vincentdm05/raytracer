@@ -46,7 +46,7 @@ Vec3 Raytracer::gammaCorrect(const Vec3 &colour) const
 Vec3 Raytracer::getColour(const Ray &r, const Scene &scene, uint depth) const
 {
 	HitRecord rec;
-	if (scene.hit(r, 0.001, std::numeric_limits<Real>::max(), rec))
+	if (scene.hit(r, 0.001, max(), rec))
 	{
 		Ray scattered;
 		Vec3 attenuation;

@@ -6,6 +6,7 @@
 #include "Camera.hpp"
 #include "Material.hpp"
 #include "Math.hpp"
+#include "Random.hpp"
 #include "Ray.hpp"
 #include "Sampling.hpp"
 #include "Scene.hpp"

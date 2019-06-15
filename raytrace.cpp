@@ -6,6 +6,7 @@
 #include "Lambertian.hpp"
 #include "Math.hpp"
 #include "Metal.hpp"
+#include "Random.hpp"
 #include "Ray.hpp"
 #include "Raytracer.hpp"
 #include "Sampling.hpp"

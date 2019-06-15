@@ -4,6 +4,7 @@
 
 #include "Material.hpp"
 #include "Math.hpp"
+#include "Random.hpp"
 #include "Sampling.hpp"
 
 class Dielectric : public Material

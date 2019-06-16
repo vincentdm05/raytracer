@@ -9,10 +9,10 @@ class Material;
 
 struct HitRecord
 {
-	Real t;
+	Real t = 0;
 	Vec3 normal;
 	Vec3 point;
-	const Material *material;
+	const Material *material = nullptr;
 };
 
 class Hitable

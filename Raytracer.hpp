@@ -99,11 +99,15 @@ Vec3 Raytracer::samplePixel(const Camera &camera, const Scene &scene, int col, i
 
 void Raytracer::printImage(const Scene &scene, const Camera &camera) const
 {
+	Camera myCamera = camera;
+	if (visualiseDepth || visualiseBounces)
+		myCamera.setDepthOfFieldEnabled(false);
+
 	const int nThreads = 1;
 	std::future<Vec3> futures[nThreads];
 	int samplesPerThread = samplesPerPixel / nThreads;
 
-	const Viewport &viewport = camera.getViewport();
+	const Viewport &viewport = myCamera.getViewport();
 
 	int nx = viewport.width();
 	int ny = viewport.height();
@@ -117,7 +121,7 @@ void Raytracer::printImage(const Scene &scene, const Camera &camera) const
 			if (nThreads > 1)
 			{
 				for (int s = 0; s < nThreads; s++)
-					futures[s] = std::async(std::launch::async, &Raytracer::samplePixel, this, std::ref(camera), std::ref(scene), col, row, std::ref(viewport), samplesPerThread);
+					futures[s] = std::async(std::launch::async, &Raytracer::samplePixel, this, std::ref(myCamera), std::ref(scene), col, row, std::ref(viewport), samplesPerThread);
 
 				for (int s = 0; s < nThreads; s++)
 					colour += futures[s].get();
@@ -125,7 +129,7 @@ void Raytracer::printImage(const Scene &scene, const Camera &camera) const
 			}
 			else
 			{
-				colour = samplePixel(camera, scene, col, row, viewport, samplesPerPixel);
+				colour = samplePixel(myCamera, scene, col, row, viewport, samplesPerPixel);
 			}
 
 			colour = 255.99 * gammaCorrect(colour);

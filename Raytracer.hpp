@@ -22,7 +22,7 @@ class Raytracer
 {
 private:
 	bool outputEnabled = true;
-	uint maxDepth = 50;
+	uint maxBounces = 50;
 	uint samplesPerPixel = 100;
 
 	Vec3 gammaCorrect(const Vec3 &colour) const;
@@ -30,11 +30,11 @@ private:
 public:
 	Raytracer() {}
 
-	Vec3 getColour(const Ray &r, const Scene &scene, uint depth = 0) const;
+	Vec3 getColour(const Ray &r, const Scene &scene, uint bounces = 0) const;
 	Vec3 samplePixel(const Camera &camera, const Scene &scene, int col, int row, const Viewport &vp, uint nSamples = 1) const;
 	void printImage(const Scene &scene, const Camera &camera) const;
 	void setOutputEnabled(bool value) { outputEnabled = value; }
-	void setMaxDepth(uint d) { maxDepth = d; }
+	void setMaxBounces(uint n) { maxBounces = n; }
 	void setSamplesPerPixel(uint n) { samplesPerPixel = n; }
 };
 
@@ -44,15 +44,15 @@ Vec3 Raytracer::gammaCorrect(const Vec3 &colour) const
 	return sqrt(colour);
 }
 
-Vec3 Raytracer::getColour(const Ray &r, const Scene &scene, uint depth) const
+Vec3 Raytracer::getColour(const Ray &r, const Scene &scene, uint bounces) const
 {
 	HitRecord rec;
 	if (scene.hit(r, 0.001, maxReal(), rec))
 	{
 		Ray scattered;
 		Vec3 attenuation;
-		if (depth < maxDepth && rec.material && rec.material->scatter(r, rec, attenuation, scattered))
-			return getColour(scattered, scene, depth + 1) * attenuation;
+		if (bounces < maxBounces && rec.material && rec.material->scatter(r, rec, attenuation, scattered))
+			return getColour(scattered, scene, bounces + 1) * attenuation;
 		else
 			return Vec3();
 	}

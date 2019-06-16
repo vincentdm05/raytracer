@@ -10,12 +10,12 @@ inline Real pi()
 	return Real(pi_val);
 }
 
-inline Real min()
+inline Real minReal()
 {
 	return std::numeric_limits<Real>::min();
 }
 
-inline Real max()
+inline Real maxReal()
 {
 	return std::numeric_limits<Real>::max();
 }

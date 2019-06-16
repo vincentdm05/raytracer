@@ -285,6 +285,9 @@ void testSceneRoughness(const Raytracer &raytracer)
 int main()
 {
 	Raytracer raytracer;
+	// raytracer.setOutputEnabled(false);
+	// raytracer.setVisualiseDepth(true);
+	// raytracer.setVisualiseBounces(true);
 
 	// testVec3();
 	// testRay();
@@ -294,7 +297,6 @@ int main()
 	testSceneRandom(raytracer);
 	// testSceneRoughness(raytracer);
 
-	// raytracer.setOutputEnabled(false);
 	// auto start = std::chrono::system_clock::now();
 	// testSceneRandom(raytracer);
 	// auto stop = std::chrono::system_clock::now();

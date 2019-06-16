@@ -22,6 +22,8 @@ class Raytracer
 {
 private:
 	bool outputEnabled = true;
+	bool visualiseDepth = false;
+	bool visualiseBounces = false;
 	uint maxBounces = 50;
 	uint samplesPerPixel = 100;
 
@@ -34,6 +36,8 @@ public:
 	Vec3 samplePixel(const Camera &camera, const Scene &scene, int col, int row, const Viewport &vp, uint nSamples = 1) const;
 	void printImage(const Scene &scene, const Camera &camera) const;
 	void setOutputEnabled(bool value) { outputEnabled = value; }
+	void setVisualiseDepth(bool value) { visualiseDepth = value; }
+	void setVisualiseBounces(bool value) { visualiseBounces = value; }
 	void setMaxBounces(uint n) { maxBounces = n; }
 	void setSamplesPerPixel(uint n) { samplesPerPixel = n; }
 };
@@ -47,7 +51,27 @@ Vec3 Raytracer::gammaCorrect(const Vec3 &colour) const
 Vec3 Raytracer::getColour(const Ray &r, const Scene &scene, uint bounces) const
 {
 	HitRecord rec;
-	if (scene.hit(r, 0.001, maxReal(), rec))
+	bool hit = scene.hit(r, 0.001, maxReal(), rec);
+
+	// Visualisations hijack the recursion train
+	if (visualiseDepth)
+	{
+		return Vec3(1, 1, 1) / (1.0 + rec.t);
+	}
+	else if (visualiseBounces)
+	{
+		if (hit)
+		{
+			Ray scattered;
+			Vec3 attenuation;
+			if (bounces < maxBounces && rec.material && rec.material->scatter(r, rec, attenuation, scattered))
+				return getColour(scattered, scene, bounces + 1);
+		}
+		return Vec3(1, 1, 1) * (Real(bounces) / Real(maxBounces));
+	}
+
+	// Normal rendering
+	if (hit)
 	{
 		Ray scattered;
 		Vec3 attenuation;

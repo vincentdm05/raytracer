@@ -3,6 +3,7 @@
 #include "../Background.hpp"
 #include "../Camera.hpp"
 #include "../Dielectric.hpp"
+#include "../Framebuffer.hpp"
 #include "../Lambertian.hpp"
 #include "../Metal.hpp"
 #include "../Raytracer.hpp"
@@ -12,10 +13,12 @@
 
 int main()
 {
+	Viewport viewport(1024, 640);
+	Framebuffer framebuffer(viewport);
+
 	Vec3 cameraPosition(13.0, 2.0, 3.0);
 	Vec3 focusPosition(0, 0.5, 0);
 	Vec3 focusDirection = focusPosition - cameraPosition;
-	Viewport viewport(1024, 640);
 	Camera camera(cameraPosition, focusDirection, Vec3(0, 1, 0), 20, viewport, 0.25, focusDirection.length() - 4.0);
 
 	int arenaDimensions[4] = { -11, 11, -11, 11 };
@@ -65,7 +68,8 @@ int main()
 		scene.add(*hitable);
 
 	Raytracer raytracer;
-	raytracer.printImage(scene, camera);
+	raytracer.render(scene, camera, framebuffer);
+	framebuffer.printImage();
 
 	for (Hitable *hitable : objects)
 		delete hitable;

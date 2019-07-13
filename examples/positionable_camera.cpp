@@ -2,6 +2,7 @@
 
 #include "../Background.hpp"
 #include "../Camera.hpp"
+#include "../Framebuffer.hpp"
 #include "../Lambertian.hpp"
 #include "../Raytracer.hpp"
 #include "../Scene.hpp"
@@ -10,7 +11,9 @@
 
 int main()
 {
-	Camera camera(Vec3(0, 0, 1), Vec3(0, 0, -1), Vec3(0, 1, 0), 45, Viewport(200, 100), 0.5, 2.0);
+	Viewport viewport(200, 100);
+	Framebuffer framebuffer(viewport);
+	Camera camera(Vec3(0, 0, 1), Vec3(0, 0, -1), Vec3(0, 1, 0), 45, viewport, 0.5, 2.0);
 
 	Lambertian material0(Vec3(0, 0, 1));
 	Lambertian material1(Vec3(1, 0, 0));
@@ -25,7 +28,8 @@ int main()
 	scene.add(sphere1);
 
 	Raytracer raytracer;
-	raytracer.printImage(scene, camera);
+	raytracer.render(scene, camera, framebuffer);
+	framebuffer.printImage();
 
 	return 0;
 }

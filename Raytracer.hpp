@@ -4,6 +4,7 @@
 
 #include "Background.hpp"
 #include "Camera.hpp"
+#include "Framebuffer.hpp"
 #include "Material.hpp"
 #include "Math.hpp"
 #include "Ray.hpp"
@@ -12,14 +13,11 @@
 #include "Viewport.hpp"
 
 #include <future>
-#include <iostream>
 #include <limits>
-#include <random>
 
 class Raytracer
 {
 private:
-	bool outputEnabled = true;
 	uint maxDepth = 50;
 	uint samplesPerPixel = 100;
 
@@ -29,9 +27,8 @@ public:
 	Raytracer() {}
 
 	Vec3 getColour(const Ray &r, const Scene &scene, uint depth = 0) const;
-	Vec3 samplePixel(const Camera &camera, const Scene &scene, int col, int row, const Viewport &vp, uint nSamples = 1) const;
-	void printImage(const Scene &scene, const Camera &camera) const;
-	void setOutputEnabled(bool value) { outputEnabled = value; }
+	Vec3 renderPixel(const Camera &camera, const Scene &scene, int col, int row, const Viewport &vp, uint nSamples = 1) const;
+	void render(const Scene &scene, const Camera &camera, Framebuffer &framebuffer) const;
 	void setMaxDepth(uint d) { maxDepth = d; }
 	void setSamplesPerPixel(uint n) { samplesPerPixel = n; }
 };
@@ -58,7 +55,7 @@ Vec3 Raytracer::getColour(const Ray &r, const Scene &scene, uint depth) const
 	return scene.background().sample(r.direction());
 }
 
-Vec3 Raytracer::samplePixel(const Camera &camera, const Scene &scene, int col, int row, const Viewport &vp, uint nSamples) const
+Vec3 Raytracer::renderPixel(const Camera &camera, const Scene &scene, int col, int row, const Viewport &vp, uint nSamples) const
 {
 	Vec3 colour;
 	for (uint i = 0; i < nSamples; i++)
@@ -71,7 +68,7 @@ Vec3 Raytracer::samplePixel(const Camera &camera, const Scene &scene, int col, i
 	return colour / nSamples;
 }
 
-void Raytracer::printImage(const Scene &scene, const Camera &camera) const
+void Raytracer::render(const Scene &scene, const Camera &camera, Framebuffer &framebuffer) const
 {
 	const int nThreads = 1;
 	std::future<Vec3> futures[nThreads];
@@ -81,8 +78,6 @@ void Raytracer::printImage(const Scene &scene, const Camera &camera) const
 
 	int nx = viewport.width();
 	int ny = viewport.height();
-	if (outputEnabled)
-		std::cout << "P3\n" << nx << " " << ny << "\n255\n";
 	for (int row = ny - 1; row >= 0; row--)
 	{
 		for (int col = 0; col < nx; col++)
@@ -91,7 +86,7 @@ void Raytracer::printImage(const Scene &scene, const Camera &camera) const
 			if (nThreads > 1)
 			{
 				for (int s = 0; s < nThreads; s++)
-					futures[s] = std::async(std::launch::async, &Raytracer::samplePixel, this, std::ref(camera), std::ref(scene), col, row, std::ref(viewport), samplesPerThread);
+					futures[s] = std::async(std::launch::async, &Raytracer::renderPixel, this, std::ref(camera), std::ref(scene), col, row, std::ref(viewport), samplesPerThread);
 
 				for (int s = 0; s < nThreads; s++)
 					colour += futures[s].get();
@@ -99,13 +94,11 @@ void Raytracer::printImage(const Scene &scene, const Camera &camera) const
 			}
 			else
 			{
-				colour = samplePixel(camera, scene, col, row, viewport, samplesPerPixel);
+				colour = renderPixel(camera, scene, col, row, viewport, samplesPerPixel);
 			}
 
 			colour = 255.99 * gammaCorrect(colour);
-
-			if (outputEnabled)
-				std::cout << int(colour.r) << " " << int(colour.g) << " " << int(colour.b) << "\n";
+			framebuffer.store(col, row, colour);
 		}
 	}
 }

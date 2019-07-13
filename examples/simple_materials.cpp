@@ -3,6 +3,7 @@
 #include "../Background.hpp"
 #include "../Camera.hpp"
 #include "../Dielectric.hpp"
+#include "../Framebuffer.hpp"
 #include "../Lambertian.hpp"
 #include "../Metal.hpp"
 #include "../Raytracer.hpp"
@@ -12,7 +13,9 @@
 
 int main()
 {
-	Camera camera(Vec3(0, 0, 0), Vec3(0, 0, -1), Vec3(0, 1, 0), 90, Viewport(200, 100), 0.25, 0.8);
+	Viewport viewport(200, 100);
+	Framebuffer framebuffer(viewport);
+	Camera camera(Vec3(0, 0, 0), Vec3(0, 0, -1), Vec3(0, 1, 0), 90, viewport, 0.25, 0.8);
 
 	Lambertian material0(Vec3(0.8, 0.3, 0.3));
 	Metal material1(Vec3(0.8, 0.8, 0.0), 0.3);
@@ -34,7 +37,8 @@ int main()
 	scene.add(transparentSphereHollow);
 
 	Raytracer raytracer;
-	raytracer.printImage(scene, camera);
+	raytracer.render(scene, camera, framebuffer);
+	framebuffer.printImage();
 
 	return 0;
 }

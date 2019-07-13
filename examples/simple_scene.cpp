@@ -3,6 +3,7 @@
 #include "../Background.hpp"
 #include "../Camera.hpp"
 #include "../Dielectric.hpp"
+#include "../Framebuffer.hpp"
 #include "../Lambertian.hpp"
 #include "../Metal.hpp"
 #include "../Raytracer.hpp"
@@ -12,10 +13,13 @@
 
 int main()
 {
+	Viewport viewport(200, 100);
+	Framebuffer framebuffer(viewport);
+
 	Vec3 cameraPosition(3.0, 3.0, 2.0);
 	Vec3 focusPosition(0, 0, -1);
 	Vec3 focusDirection = focusPosition - cameraPosition;
-	Camera camera(cameraPosition, focusDirection, Vec3(0.0, 1.0, 0.0), 20, Viewport(200, 100), 2.0, focusDirection.length());
+	Camera camera(cameraPosition, focusDirection, Vec3(0.0, 1.0, 0.0), 20, viewport, 2.0, focusDirection.length());
 
 	Lambertian material0(Vec3(0.1, 0.2, 0.5));
 	Lambertian material1(Vec3(0.8, 0.8, 0.0));
@@ -37,7 +41,8 @@ int main()
 	scene.add(sphere4);
 
 	Raytracer raytracer;
-	raytracer.printImage(scene, camera);
+	raytracer.render(scene, camera, framebuffer);
+	framebuffer.printImage();
 
 	return 0;
 }

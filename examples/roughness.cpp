@@ -2,6 +2,7 @@
 
 #include "../Background.hpp"
 #include "../Camera.hpp"
+#include "../Framebuffer.hpp"
 #include "../Metal.hpp"
 #include "../Raytracer.hpp"
 #include "../Scene.hpp"
@@ -10,10 +11,13 @@
 
 int main()
 {
+	Viewport viewport(900, 110);
+	Framebuffer framebuffer(viewport);
+
 	Vec3 cameraPosition(0.0, 1.0, 11.8);
 	Vec3 focusPosition(0, 0, -1);
 	Vec3 focusDirection = focusPosition - cameraPosition;
-	Camera camera(cameraPosition, focusDirection, Vec3(0.0, 1.0, 0.0), 5.0, Viewport(900, 110), 0.2, focusDirection.length());
+	Camera camera(cameraPosition, focusDirection, Vec3(0.0, 1.0, 0.0), 5.0, viewport, 0.2, focusDirection.length());
 
 	Scene scene;
 	scene.setBackground(Background(Vec3(0.619, 1, 0.694), Vec3(1, 0.639, 0.619)));
@@ -33,7 +37,8 @@ int main()
 	}
 
 	Raytracer raytracer;
-	raytracer.printImage(scene, camera);
+	raytracer.render(scene, camera, framebuffer);
+	framebuffer.printImage();
 
 	for (Material *material : materials)
 		delete material;

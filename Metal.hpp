@@ -14,7 +14,7 @@ private:
 public:
 	Metal() { albedo = Vec3(0.5, 0.5, 0.5); roughness = 0; }
 	Metal(const Vec3 &_albedo) : Metal(_albedo, 0) {}
-	Metal(const Vec3 &_albedo, Real _roughness) { albedo = _albedo; roughness = clamp(_roughness, 0, 1); }
+	Metal(const Vec3 &_albedo, Real _roughness) { albedo = _albedo; roughness = clamp(_roughness, 0.0, 1.0); }
 
 	virtual bool scatter(const Ray &rIn, const HitRecord &hr, Vec3 &attenuation, Ray &scattered) const;
 };

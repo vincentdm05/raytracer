@@ -12,14 +12,29 @@ inline Real pi()
 	return Real(pi_val);
 }
 
+inline int min(int a, int b)
+{
+	return a < b ? a : b;
+}
+
 inline Real min(Real a, Real b)
 {
 	return a < b ? a : b;
 }
 
+inline int max(int a, int b)
+{
+	return a > b ? a : b;
+}
+
 inline Real max(Real a, Real b)
 {
 	return a > b ? a : b;
+}
+
+inline int clamp(int a, int lower, int upper)
+{
+	return min(upper, max(lower, a));
 }
 
 inline Real clamp(Real a, Real lower, Real upper)
@@ -29,8 +44,8 @@ inline Real clamp(Real a, Real lower, Real upper)
 
 inline Vec3 lerp(const Vec3 &a, const Vec3 &b, Real t)
 {
-	t = clamp(t, 0, 1);
-	return (1 - t) * a + t * b;
+	t = clamp(t, 0.0, 1.0);
+	return (1.0 - t) * a + t * b;
 }
 
 inline Real uniformRand()

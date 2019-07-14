@@ -29,6 +29,7 @@ public:
 
 	Vec3 getColour(const Ray &r, const Scene &scene, uint depth = 0) const;
 	void renderPixels(const Camera &camera, const Scene &scene, const Viewport &vp, std::atomic<uint> &counter, Framebuffer &framebuffer) const;
+	void renderBatchedPixels(const Camera &camera, const Scene &scene, const Viewport &vp, std::atomic<uint> &counter, Framebuffer &framebuffer, uint batchSize) const;
 	void render(const Scene &scene, const Camera &camera, Framebuffer &framebuffer) const;
 	void setMaxDepth(uint d) { maxDepth = d; }
 	void setSamplesPerPixel(uint n) { samplesPerPixel = n; }
@@ -54,6 +55,36 @@ Vec3 Raytracer::getColour(const Ray &r, const Scene &scene, uint depth) const
 	}
 
 	return scene.background().sample(r.direction());
+}
+
+void Raytracer::renderBatchedPixels(const Camera &camera, const Scene &scene, const Viewport &vp, std::atomic<uint> &counter, Framebuffer &framebuffer, uint batchSize) const
+{
+	uint pixelAmount = vp.width() * vp.height();
+	uint pixelBatchAmount = max(pixelAmount / batchSize, 1);
+	uint pixelBatchIndex = counter++;
+	while (pixelBatchIndex < pixelBatchAmount)
+	{
+		uint indexStop = min(int((pixelBatchIndex + 1) * batchSize), int(pixelAmount));
+		for (uint pixelIndex = pixelBatchIndex * batchSize; pixelIndex < indexStop; pixelIndex++)
+		{
+			uint row = pixelIndex / vp.width();
+			uint col = pixelIndex % vp.width();
+			Vec3 colour;
+			for (uint i = 0; i < samplesPerPixel; i++)
+			{
+				Real u = Real(col + uniformRand()) / vp.width();
+				Real v = Real(row + uniformRand()) / vp.height();
+				Ray r = camera.getRay(u, v);
+				colour += getColour(r, scene);
+			}
+			colour /= samplesPerPixel;
+			colour = 255.99 * gammaCorrect(colour);
+
+			framebuffer.store(int(col), int(row), colour);
+		}
+
+		pixelBatchIndex = counter++;
+	}
 }
 
 void Raytracer::renderPixels(const Camera &camera, const Scene &scene, const Viewport &vp, std::atomic<uint> &counter, Framebuffer &framebuffer) const

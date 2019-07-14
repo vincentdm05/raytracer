@@ -12,8 +12,9 @@
 #include "Vec3.hpp"
 #include "Viewport.hpp"
 
-#include <future>
+#include <atomic>
 #include <limits>
+#include <thread>
 
 class Raytracer
 {
@@ -27,7 +28,7 @@ public:
 	Raytracer() {}
 
 	Vec3 getColour(const Ray &r, const Scene &scene, uint depth = 0) const;
-	Vec3 renderPixel(const Camera &camera, const Scene &scene, int col, int row, const Viewport &vp, uint nSamples = 1) const;
+	void renderPixels(const Camera &camera, const Scene &scene, const Viewport &vp, std::atomic<uint> &counter, Framebuffer &framebuffer) const;
 	void render(const Scene &scene, const Camera &camera, Framebuffer &framebuffer) const;
 	void setMaxDepth(uint d) { maxDepth = d; }
 	void setSamplesPerPixel(uint n) { samplesPerPixel = n; }
@@ -55,50 +56,43 @@ Vec3 Raytracer::getColour(const Ray &r, const Scene &scene, uint depth) const
 	return scene.background().sample(r.direction());
 }
 
-Vec3 Raytracer::renderPixel(const Camera &camera, const Scene &scene, int col, int row, const Viewport &vp, uint nSamples) const
+void Raytracer::renderPixels(const Camera &camera, const Scene &scene, const Viewport &vp, std::atomic<uint> &counter, Framebuffer &framebuffer) const
 {
-	Vec3 colour;
-	for (uint i = 0; i < nSamples; i++)
+	uint pixelAmount = vp.width() * vp.height();
+	uint pixelIndex = counter++;
+	while (pixelIndex < pixelAmount)
 	{
-		Real u = Real(col + uniformRand()) / vp.width();
-		Real v = Real(row + uniformRand()) / vp.height();
-		Ray r = camera.getRay(u, v);
-		colour += getColour(r, scene);
+		uint row = pixelIndex / vp.width();
+		uint col = pixelIndex % vp.width();
+		Vec3 colour;
+		for (uint i = 0; i < samplesPerPixel; i++)
+		{
+			Real u = Real(col + uniformRand()) / vp.width();
+			Real v = Real(row + uniformRand()) / vp.height();
+			Ray r = camera.getRay(u, v);
+			colour += getColour(r, scene);
+		}
+		colour /= samplesPerPixel;
+		colour = 255.99 * gammaCorrect(colour);
+
+		framebuffer.store(int(col), int(row), colour);
+
+		pixelIndex = counter++;
 	}
-	return colour / nSamples;
 }
 
 void Raytracer::render(const Scene &scene, const Camera &camera, Framebuffer &framebuffer) const
 {
-	const int nThreads = 1;
-	std::future<Vec3> futures[nThreads];
-	int samplesPerThread = samplesPerPixel / nThreads;
-
+	std::atomic<uint> renderPixelCounter {0};
 	const Viewport &viewport = camera.getViewport();
 
-	int nx = viewport.width();
-	int ny = viewport.height();
-	for (int row = ny - 1; row >= 0; row--)
-	{
-		for (int col = 0; col < nx; col++)
-		{
-			Vec3 colour;
-			if (nThreads > 1)
-			{
-				for (int s = 0; s < nThreads; s++)
-					futures[s] = std::async(std::launch::async, &Raytracer::renderPixel, this, std::ref(camera), std::ref(scene), col, row, std::ref(viewport), samplesPerThread);
+	const uint nThreads = max(std::thread::hardware_concurrency(), 1) - 1;
+	std::thread threads[nThreads];
+	for (uint i = 0; i < nThreads; i++)
+		threads[i] = std::thread(&Raytracer::renderPixels, this, std::ref(camera), std::ref(scene), std::ref(viewport), std::ref(renderPixelCounter), std::ref(framebuffer));
 
-				for (int s = 0; s < nThreads; s++)
-					colour += futures[s].get();
-				colour /= nThreads;
-			}
-			else
-			{
-				colour = renderPixel(camera, scene, col, row, viewport, samplesPerPixel);
-			}
+	renderPixels(camera, scene, viewport, renderPixelCounter, framebuffer);
 
-			colour = 255.99 * gammaCorrect(colour);
-			framebuffer.store(col, row, colour);
-		}
-	}
+	for (uint i = 0; i < nThreads; i++)
+		threads[i].join();
 }

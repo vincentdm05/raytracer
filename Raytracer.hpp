@@ -13,8 +13,8 @@
 #include "Viewport.hpp"
 
 #include <atomic>
+#include <future>
 #include <limits>
-#include <thread>
 
 class Raytracer
 {
@@ -118,12 +118,12 @@ void Raytracer::render(const Scene &scene, const Camera &camera, Framebuffer &fr
 	const Viewport &viewport = camera.getViewport();
 
 	const uint nThreads = max(std::thread::hardware_concurrency(), 1) - 1;
-	std::thread threads[nThreads];
+	std::future<void> futures[nThreads];
 	for (uint i = 0; i < nThreads; i++)
-		threads[i] = std::thread(&Raytracer::renderPixels, this, std::ref(camera), std::ref(scene), std::ref(viewport), std::ref(renderPixelCounter), std::ref(framebuffer));
+		futures[i] = std::async(std::launch::async, &Raytracer::renderPixels, this, std::ref(camera), std::ref(scene), std::ref(viewport), std::ref(renderPixelCounter), std::ref(framebuffer));
 
 	renderPixels(camera, scene, viewport, renderPixelCounter, framebuffer);
 
 	for (uint i = 0; i < nThreads; i++)
-		threads[i].join();
+		futures[i].get();
 }

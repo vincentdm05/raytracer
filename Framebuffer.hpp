@@ -73,9 +73,9 @@ void Framebuffer::printImage() const
 	// PPM header
 	std::cout << "P3\n" << width << " " << height << "\n255\n";
 
-	for (int row = height - 1; row >= 0; row--)
+	for (int row = int(height) - 1; row >= 0; row--)
 	{
-		for (int col = 0; col < width; col++)
+		for (int col = 0; col < int(width); col++)
 		{
 			Vec3 colour = load(col, row);
 			std::cout << int(colour.r) << " " << int(colour.g) << " " << int(colour.b) << "\n";

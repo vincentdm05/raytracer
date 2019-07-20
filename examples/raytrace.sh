@@ -20,7 +20,7 @@ show()
 	environment="$(uname -s)"
 	case "$environment" in
 		Darwin*) open "$1";;
-		MINGW*) nomacs "$1";;
+		MINGW*|MSYS*) nomacs "$1" &;;
 		*) echo "Couldn't show $1, please open manually."
 	esac
 }

@@ -140,9 +140,9 @@ void Raytracer::renderPixels(const Camera &camera, const Scene &scene, const Vie
 
 void Raytracer::render(const Scene &scene, const Camera &camera, Framebuffer &framebuffer) const
 {
-    Camera myCamera = camera;
-    if (visualiseDepth || visualiseBounces)
-        myCamera.setDepthOfFieldEnabled(false);
+	Camera myCamera = camera;
+	if (visualiseDepth || visualiseBounces)
+		myCamera.setDepthOfFieldEnabled(false);
     
 	std::atomic<uint> renderPixelCounter {0};
 	const Viewport &viewport = myCamera.getViewport();

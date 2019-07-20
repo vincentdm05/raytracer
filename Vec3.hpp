@@ -9,16 +9,22 @@
 
 class Vec3
 {
-private:
-	Real e[3];
-
 public:
-	Real &x = e[0];
-	Real &y = e[1];
-	Real &z = e[2];
-	Real &r = e[0];
-	Real &g = e[1];
-	Real &b = e[2];
+	union
+	{
+		struct
+		{
+			Real x = 0;
+			Real y = 0;
+			Real z = 0;
+		};
+		struct
+		{
+			Real r;
+			Real g;
+			Real b;
+		};
+	};
 
 	Vec3() { x = 0; y = 0; z = 0; }
 	Vec3(Real _x, Real _y, Real _z) { x = _x; y = _y; z = _z; }
@@ -33,8 +39,8 @@ public:
 
 	inline const Vec3 &operator+() const { return *this; }
 	inline Vec3 operator-() const { return Vec3(-x, -y, -z); }
-	inline Real operator[](uint i) const { return e[i % 3]; }
-	inline Real &operator[](uint i) { return e[i % 3]; }
+	inline Real operator[](uint i) const { return *(&x + (i % 3)); }
+	inline Real &operator[](uint i) { return *(&x + (i % 3)); }
 
 	inline Vec3 &operator+=(const Vec3 &v);
 	inline Vec3 &operator-=(const Vec3 &v);

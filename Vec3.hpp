@@ -2,6 +2,8 @@
 
 #include "Common.hpp"
 
+#include "Math.hpp"
+
 #include <iostream>
 #include <math.h>
 
@@ -191,6 +193,37 @@ inline Vec3 operator*(Real c, const Vec3 &v)
 inline Vec3 operator/(Real c, const Vec3 &v)
 {
 	return Vec3(c / v.x, c / v.y, c / v.z);
+}
+
+inline Real min(const Vec3 &v)
+{
+	return min(v.x, min(v.y, v.z));
+}
+
+inline Vec3 min(const Vec3 &a, const Vec3 &b)
+{
+	return Vec3(min(a.x, b.x), min(a.y, b.y), min(a.z, b.z));
+}
+
+inline Real max(const Vec3 &v)
+{
+	return max(v.x, max(v.y, v.z));
+}
+
+inline Vec3 max(const Vec3 &a, const Vec3 &b)
+{
+	return Vec3(max(a.x, b.x), max(a.y, b.y), max(a.z, b.z));
+}
+
+inline Vec3 abs(const Vec3 &v)
+{
+	return Vec3(abs(v.x), abs(v.y), abs(v.z));
+}
+
+inline Vec3 lerp(const Vec3 &a, const Vec3 &b, Real t)
+{
+	t = clamp(t, 0.0, 1.0);
+	return (1 - t) * a + t * b;
 }
 
 inline Real dot(const Vec3 &a, const Vec3 &b)

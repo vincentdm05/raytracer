@@ -7,7 +7,9 @@
 #include "Framebuffer.hpp"
 #include "Material.hpp"
 #include "Math.hpp"
+#include "Random.hpp"
 #include "Ray.hpp"
+#include "Sampling.hpp"
 #include "Scene.hpp"
 #include "Vec3.hpp"
 #include "Viewport.hpp"
@@ -19,7 +21,9 @@
 class Raytracer
 {
 private:
-	uint maxDepth = 50;
+	bool visualiseDepth = false;
+	bool visualiseBounces = false;
+	uint maxBounces = 50;
 	uint samplesPerPixel = 100;
 
 	Vec3 gammaCorrect(const Vec3 &colour) const;
@@ -27,11 +31,13 @@ private:
 public:
 	Raytracer() {}
 
-	Vec3 getColour(const Ray &r, const Scene &scene, uint depth = 0) const;
+	Vec3 getColour(const Ray &r, const Scene &scene, uint bounces = 0) const;
 	void renderPixels(const Camera &camera, const Scene &scene, const Viewport &vp, std::atomic<uint> &counter, Framebuffer &framebuffer) const;
 	void renderBatchedPixels(const Camera &camera, const Scene &scene, const Viewport &vp, std::atomic<uint> &counter, Framebuffer &framebuffer, uint batchSize) const;
 	void render(const Scene &scene, const Camera &camera, Framebuffer &framebuffer) const;
-	void setMaxDepth(uint d) { maxDepth = d; }
+	void setVisualiseDepth(bool value) { visualiseDepth = value; }
+	void setVisualiseBounces(bool value) { visualiseBounces = value; }
+	void setMaxBounces(uint n) { maxBounces = n; }
 	void setSamplesPerPixel(uint n) { samplesPerPixel = n; }
 };
 
@@ -41,15 +47,35 @@ Vec3 Raytracer::gammaCorrect(const Vec3 &colour) const
 	return sqrt(colour);
 }
 
-Vec3 Raytracer::getColour(const Ray &r, const Scene &scene, uint depth) const
+Vec3 Raytracer::getColour(const Ray &r, const Scene &scene, uint bounces) const
 {
 	HitRecord rec;
-	if (scene.hit(r, 0.001, std::numeric_limits<Real>::max(), rec))
+	bool hit = scene.hit(r, 0.001, maxReal(), rec);
+
+	// Visualisations hijack the recursion train
+	if (visualiseDepth)
+	{
+		return Vec3(1, 1, 1) / (1.0 + rec.t);
+	}
+	else if (visualiseBounces)
+	{
+		if (hit)
+		{
+			Ray scattered;
+			Vec3 attenuation;
+			if (bounces < maxBounces && rec.material && rec.material->scatter(r, rec, attenuation, scattered))
+				return getColour(scattered, scene, bounces + 1);
+		}
+		return Vec3(1, 1, 1) * (Real(bounces) / Real(maxBounces));
+	}
+
+	// Normal rendering
+	if (hit)
 	{
 		Ray scattered;
 		Vec3 attenuation;
-		if (depth < maxDepth && rec.material && rec.material->scatter(r, rec, attenuation, scattered))
-			return getColour(scattered, scene, depth + 1) * attenuation;
+		if (bounces < maxBounces && rec.material && rec.material->scatter(r, rec, attenuation, scattered))
+			return getColour(scattered, scene, bounces + 1) * attenuation;
 		else
 			return Vec3();
 	}
@@ -114,15 +140,19 @@ void Raytracer::renderPixels(const Camera &camera, const Scene &scene, const Vie
 
 void Raytracer::render(const Scene &scene, const Camera &camera, Framebuffer &framebuffer) const
 {
+    Camera myCamera = camera;
+    if (visualiseDepth || visualiseBounces)
+        myCamera.setDepthOfFieldEnabled(false);
+    
 	std::atomic<uint> renderPixelCounter {0};
-	const Viewport &viewport = camera.getViewport();
+	const Viewport &viewport = myCamera.getViewport();
 
 	const uint nThreads = max(std::thread::hardware_concurrency(), 1) - 1;
 	std::future<void> futures[nThreads];
 	for (uint i = 0; i < nThreads; i++)
-		futures[i] = std::async(std::launch::async, &Raytracer::renderPixels, this, std::ref(camera), std::ref(scene), std::ref(viewport), std::ref(renderPixelCounter), std::ref(framebuffer));
+		futures[i] = std::async(std::launch::async, &Raytracer::renderPixels, this, std::ref(myCamera), std::ref(scene), std::ref(viewport), std::ref(renderPixelCounter), std::ref(framebuffer));
 
-	renderPixels(camera, scene, viewport, renderPixelCounter, framebuffer);
+	renderPixels(myCamera, scene, viewport, renderPixelCounter, framebuffer);
 
 	for (uint i = 0; i < nThreads; i++)
 		futures[i].get();

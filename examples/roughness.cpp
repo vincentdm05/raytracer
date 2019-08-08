@@ -9,7 +9,7 @@
 #include "../Sphere.hpp"
 #include "../Vec3.hpp"
 
-int main()
+int main(int argc, char *argv[])
 {
 	Viewport viewport(900, 110);
 	Framebuffer framebuffer(viewport);
@@ -38,7 +38,7 @@ int main()
 
 	Raytracer raytracer;
 	raytracer.render(scene, camera, framebuffer);
-	framebuffer.printImage();
+	framebuffer.writePpm(argv[argc > 1 ? 1 : 0]);
 
 	for (Material *material : materials)
 		delete material;

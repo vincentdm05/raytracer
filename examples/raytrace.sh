@@ -26,5 +26,5 @@ show()
 }
 
 g++ -O3 -Wall -std=c++11 -o bin/"${example}" examples/"${example}".cpp &&
-time { ./bin/"${example}" > examples/"${example}".ppm ; } &&
+time { ./bin/"${example}" examples/"${example}" ; } &&
 show examples/"${example}".ppm

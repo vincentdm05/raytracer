@@ -6,6 +6,10 @@
 #include "Vec3.hpp"
 #include "Viewport.hpp"
 
+#include <fstream>
+#include <iostream>
+#include <string>
+
 class Framebuffer
 {
 private:
@@ -23,7 +27,7 @@ public:
 	void blend(int x, int y, const Vec3 &value);
 	Vec3 load(int x, int y) const;
 	Vec3 sample(Real u, Real v) const;
-	void printImage() const;
+	void writePpm(const std::string &fileName) const;
 };
 
 uint Framebuffer::positionToIndex(int x, int y) const
@@ -68,17 +72,35 @@ Vec3 Framebuffer::sample(Real u, Real v) const
 	return load(x, y);
 }
 
-void Framebuffer::printImage() const
+void Framebuffer::writePpm(const std::string &baseFileName) const
 {
+	std::string fileName(baseFileName);
+	std::string extension(".ppm");
+	if (baseFileName.size() <= extension.size() ||
+		baseFileName.compare(baseFileName.size() - extension.size(), extension.size(), extension) != 0)
+	{
+		fileName += extension;
+	}
+	std::ofstream file(fileName);
+
+	if (!file.is_open())
+	{
+		std::cerr << "Could not open file " << fileName << " for writing." << std::endl;
+		return;
+	}
+
 	// PPM header
-	std::cout << "P3\n" << width << " " << height << "\n255\n";
+	file << "P3\n" << width << " " << height << "\n255\n";
 
 	for (int row = int(height) - 1; row >= 0; row--)
 	{
 		for (int col = 0; col < int(width); col++)
 		{
 			Vec3 colour = load(col, row);
-			std::cout << int(colour.r) << " " << int(colour.g) << " " << int(colour.b) << "\n";
+			file << int(colour.r) << " " << int(colour.g) << " " << int(colour.b) << "\n";
 		}
 	}
+
+	file.close();
+	std::cout << "Result written to " << fileName << std::endl;
 }

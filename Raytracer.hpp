@@ -117,8 +117,12 @@ void Raytracer::renderPixels(const Camera &camera, const Scene &scene, const Vie
 {
 	uint pixelAmount = vp.width() * vp.height();
 	uint pixelIndex = counter++;
-	while (pixelIndex < pixelAmount)
+	while (true)
 	{
+		pixelIndex = counter++;
+		if (pixelIndex >= pixelAmount)
+			break;
+
 		uint row = pixelIndex / vp.width();
 		uint col = pixelIndex % vp.width();
 		Vec3 colour;
@@ -133,8 +137,6 @@ void Raytracer::renderPixels(const Camera &camera, const Scene &scene, const Vie
 		colour = 255.99 * gammaCorrect(colour);
 
 		framebuffer.store(int(col), int(row), colour);
-
-		pixelIndex = counter++;
 	}
 }
 

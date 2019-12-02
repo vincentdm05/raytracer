@@ -6,7 +6,7 @@
 
 inline Real uniformRand()
 {
-	static std::default_random_engine generator;
-	static std::uniform_real_distribution<Real> distribution(0.0, 1.0);
-	return distribution(generator);
+	static thread_local std::default_random_engine engine;
+	std::uniform_real_distribution<Real> distribution(0.0, 1.0);
+	return distribution(engine);
 }

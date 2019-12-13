@@ -116,10 +116,9 @@ void Raytracer::renderBatchedPixels(const Camera &camera, const Scene &scene, co
 void Raytracer::renderPixels(const Camera &camera, const Scene &scene, const Viewport &vp, std::atomic<uint> &counter, Framebuffer<Vec3> &framebuffer) const
 {
 	uint pixelAmount = vp.width() * vp.height();
-	uint pixelIndex = counter++;
 	while (true)
 	{
-		pixelIndex = counter++;
+		uint pixelIndex = counter++;
 		if (pixelIndex >= pixelAmount)
 			break;
 

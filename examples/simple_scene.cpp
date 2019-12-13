@@ -3,6 +3,7 @@
 #include "../Background.hpp"
 #include "../Camera.hpp"
 #include "../Dielectric.hpp"
+#include "../File.hpp"
 #include "../Framebuffer.hpp"
 #include "../Lambertian.hpp"
 #include "../Metal.hpp"
@@ -42,7 +43,7 @@ int main(int argc, char *argv[])
 
 	Raytracer raytracer;
 	raytracer.render(scene, camera, framebuffer);
-	framebuffer.writePpm(argv[argc > 1 ? 1 : 0]);
+	file::writePpm(argv[argc > 1 ? 1 : 0], framebuffer, 255);
 
 	return 0;
 }

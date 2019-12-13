@@ -2,6 +2,7 @@
 
 #include "../Background.hpp"
 #include "../Camera.hpp"
+#include "../File.hpp"
 #include "../Framebuffer.hpp"
 #include "../Metal.hpp"
 #include "../Raytracer.hpp"
@@ -38,7 +39,7 @@ int main(int argc, char *argv[])
 
 	Raytracer raytracer;
 	raytracer.render(scene, camera, framebuffer);
-	framebuffer.writePpm(argv[argc > 1 ? 1 : 0]);
+	file::writePpm(argv[argc > 1 ? 1 : 0], framebuffer, 255);
 
 	for (Material *material : materials)
 		delete material;

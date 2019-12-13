@@ -12,7 +12,7 @@
 int main(int argc, char *argv[])
 {
 	Viewport viewport(900, 110);
-	Framebuffer framebuffer(viewport);
+	Framebuffer<Vec3> framebuffer(viewport);
 
 	Vec3 cameraPosition(0.0, 1.0, 11.8);
 	Vec3 focusPosition(0, 0, -1);

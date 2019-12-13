@@ -32,9 +32,9 @@ public:
 	Raytracer() {}
 
 	Vec3 getColour(const Ray &r, const Scene &scene, uint bounces = 0) const;
-	void renderPixels(const Camera &camera, const Scene &scene, const Viewport &vp, std::atomic<uint> &counter, Framebuffer &framebuffer) const;
-	void renderBatchedPixels(const Camera &camera, const Scene &scene, const Viewport &vp, std::atomic<uint> &counter, Framebuffer &framebuffer, uint batchSize) const;
-	void render(const Scene &scene, const Camera &camera, Framebuffer &framebuffer) const;
+	void renderPixels(const Camera &camera, const Scene &scene, const Viewport &vp, std::atomic<uint> &counter, Framebuffer<Vec3> &framebuffer) const;
+	void renderBatchedPixels(const Camera &camera, const Scene &scene, const Viewport &vp, std::atomic<uint> &counter, Framebuffer<Vec3> &framebuffer, uint batchSize) const;
+	void render(const Scene &scene, const Camera &camera, Framebuffer<Vec3> &framebuffer) const;
 	void setVisualiseDepth(bool value) { visualiseDepth = value; }
 	void setVisualiseBounces(bool value) { visualiseBounces = value; }
 	void setMaxBounces(uint n) { maxBounces = n; }
@@ -83,7 +83,7 @@ Vec3 Raytracer::getColour(const Ray &r, const Scene &scene, uint bounces) const
 	return scene.background().sample(r.direction());
 }
 
-void Raytracer::renderBatchedPixels(const Camera &camera, const Scene &scene, const Viewport &vp, std::atomic<uint> &counter, Framebuffer &framebuffer, uint batchSize) const
+void Raytracer::renderBatchedPixels(const Camera &camera, const Scene &scene, const Viewport &vp, std::atomic<uint> &counter, Framebuffer<Vec3> &framebuffer, uint batchSize) const
 {
 	uint pixelAmount = vp.width() * vp.height();
 	uint pixelBatchAmount = max(pixelAmount / batchSize, 1);
@@ -113,7 +113,7 @@ void Raytracer::renderBatchedPixels(const Camera &camera, const Scene &scene, co
 	}
 }
 
-void Raytracer::renderPixels(const Camera &camera, const Scene &scene, const Viewport &vp, std::atomic<uint> &counter, Framebuffer &framebuffer) const
+void Raytracer::renderPixels(const Camera &camera, const Scene &scene, const Viewport &vp, std::atomic<uint> &counter, Framebuffer<Vec3> &framebuffer) const
 {
 	uint pixelAmount = vp.width() * vp.height();
 	uint pixelIndex = counter++;
@@ -140,7 +140,7 @@ void Raytracer::renderPixels(const Camera &camera, const Scene &scene, const Vie
 	}
 }
 
-void Raytracer::render(const Scene &scene, const Camera &camera, Framebuffer &framebuffer) const
+void Raytracer::render(const Scene &scene, const Camera &camera, Framebuffer<Vec3> &framebuffer) const
 {
 	Camera myCamera = camera;
 	if (visualiseDepth || visualiseBounces)

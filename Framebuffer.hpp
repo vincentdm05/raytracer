@@ -10,12 +10,13 @@
 #include <iostream>
 #include <string>
 
+template <typename DataType>
 class Framebuffer
 {
 private:
 	uint width = 0;
 	uint height = 0;
-	Vec3 *data = nullptr;
+	DataType *data = nullptr;
 
 	uint positionToIndex(int x, int y) const;
 
@@ -23,14 +24,15 @@ public:
 	Framebuffer(const Viewport &vp);
 	~Framebuffer() { delete[] data; }
 
-	void store(int x, int y, const Vec3 &value);
-	void blend(int x, int y, const Vec3 &value);
-	Vec3 load(int x, int y) const;
-	Vec3 sample(Real u, Real v) const;
+	void store(int x, int y, const DataType &value);
+	void blend(int x, int y, const DataType &value);
+	DataType load(int x, int y) const;
+	DataType sample(Real u, Real v) const;
 	void writePpm(const std::string &fileName) const;
 };
 
-uint Framebuffer::positionToIndex(int x, int y) const
+template <typename DataType>
+uint Framebuffer<DataType>::positionToIndex(int x, int y) const
 {
 	// TODO: ordering, e.g. Morton
 	x = clamp(x, 0, width - 1);
@@ -38,33 +40,38 @@ uint Framebuffer::positionToIndex(int x, int y) const
 	return uint(x + y * width);
 }
 
-Framebuffer::Framebuffer(const Viewport &vp)
+template <typename DataType>
+Framebuffer<DataType>::Framebuffer(const Viewport &vp)
 {
 	width = max(vp.width(), 1);
 	height = max(vp.height(), 1);
-	data = new Vec3[width * height]();
+	data = new DataType[width * height]();
 }
 
-void Framebuffer::store(int x, int y, const Vec3 &value)
+template <typename DataType>
+void Framebuffer<DataType>::store(int x, int y, const DataType &value)
 {
 	uint index = positionToIndex(x, y);
 	data[index] = value;
 }
 
-void Framebuffer::blend(int x, int y, const Vec3 &value)
+template <typename DataType>
+void Framebuffer<DataType>::blend(int x, int y, const DataType &value)
 {
 	uint index = positionToIndex(x, y);
 	// TODO: blend functions
 	data[index] += value;
 }
 
-Vec3 Framebuffer::load(int x, int y) const
+template <typename DataType>
+DataType Framebuffer<DataType>::load(int x, int y) const
 {
 	uint index = positionToIndex(x, y);
 	return data[index];
 }
 
-Vec3 Framebuffer::sample(Real u, Real v) const
+template <typename DataType>
+DataType Framebuffer<DataType>::sample(Real u, Real v) const
 {
 	// TODO: filtering
 	int x = int(round(u * width));
@@ -72,7 +79,8 @@ Vec3 Framebuffer::sample(Real u, Real v) const
 	return load(x, y);
 }
 
-void Framebuffer::writePpm(const std::string &baseFileName) const
+template <>
+void Framebuffer<Vec3>::writePpm(const std::string &baseFileName) const
 {
 	std::string fileName(baseFileName);
 	std::string extension(".ppm");

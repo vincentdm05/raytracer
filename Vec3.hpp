@@ -14,9 +14,9 @@ public:
 	{
 		struct
 		{
-			Real x = 0;
-			Real y = 0;
-			Real z = 0;
+			Real x;
+			Real y;
+			Real z;
 		};
 		struct
 		{

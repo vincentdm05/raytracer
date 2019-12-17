@@ -23,6 +23,8 @@ public:
 	Framebuffer(const Viewport &vp);
 	~Framebuffer() { delete[] data; }
 
+	uint getWidth() const { return width; }
+	uint getHeight() const { return height; }
 	void store(int x, int y, const DataType &value);
 	void blend(int x, int y, const DataType &value);
 	DataType load(int x, int y) const;

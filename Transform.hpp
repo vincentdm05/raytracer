@@ -45,8 +45,7 @@ Transform::Transform(const Quat &_rotation, const Vec3 &_translation, Real _scal
 
 void Transform::setScale(Real _s)
 {
-	if (_s <= 0.0)
-		_s = 1.0;
+	// Careful with scale close to zero
 	s = _s;
 	invS = 1.0 / _s;
 }

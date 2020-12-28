@@ -43,8 +43,8 @@ uint Framebuffer<DataType>::positionToIndex(int x, int y) const
 template <typename DataType>
 Framebuffer<DataType>::Framebuffer(const Viewport &vp)
 {
-	width = max(vp.width(), 1);
-	height = max(vp.height(), 1);
+	width = max(vp.width(), 1u);
+	height = max(vp.height(), 1u);
 	data = new DataType[width * height]();
 }
 

@@ -16,7 +16,6 @@
 
 #include <atomic>
 #include <future>
-#include <limits>
 
 class Raytracer
 {
@@ -32,8 +31,9 @@ public:
 	Raytracer() {}
 
 	Vec3 getColour(const Ray &r, const Scene &scene, uint bounces = 0) const;
+	void renderTile(const Camera &camera, const Scene &scene, const Viewport &vp, uint tileX, uint tileY, uint tileSize, Framebuffer<Vec3> &framebuffer) const;
+	void renderTiles(const Camera &camera, const Scene &scene, const Viewport &vp, std::atomic<uint> &counter, Framebuffer<Vec3> &framebuffer) const;
 	void renderPixels(const Camera &camera, const Scene &scene, const Viewport &vp, std::atomic<uint> &counter, Framebuffer<Vec3> &framebuffer) const;
-	void renderBatchedPixels(const Camera &camera, const Scene &scene, const Viewport &vp, std::atomic<uint> &counter, Framebuffer<Vec3> &framebuffer, uint batchSize) const;
 	void render(const Scene &scene, const Camera &camera, Framebuffer<Vec3> &framebuffer) const;
 	void setVisualiseDepth(bool value) { visualiseDepth = value; }
 	void setVisualiseBounces(bool value) { visualiseBounces = value; }
@@ -83,33 +83,66 @@ Vec3 Raytracer::getColour(const Ray &r, const Scene &scene, uint bounces) const
 	return scene.background().sample(r.direction());
 }
 
-void Raytracer::renderBatchedPixels(const Camera &camera, const Scene &scene, const Viewport &vp, std::atomic<uint> &counter, Framebuffer<Vec3> &framebuffer, uint batchSize) const
+void Raytracer::renderTile(const Camera &camera, const Scene &scene, const Viewport &vp, uint tileX, uint tileY, uint tileSize, Framebuffer<Vec3> &framebuffer) const
 {
-	uint pixelAmount = vp.width() * vp.height();
-	uint pixelBatchAmount = max(pixelAmount / batchSize, 1);
-	uint pixelBatchIndex = counter++;
-	while (pixelBatchIndex < pixelBatchAmount)
+	uint tileOffsetX = tileX * tileSize;
+	uint tileOffsetY = tileY * tileSize;
+
+	uint stopX = min(tileOffsetX + tileSize, vp.width());
+	uint stopY = min(tileOffsetY + tileSize, vp.height());
+	for (uint row = tileOffsetY; row < stopY; row++)
 	{
-		uint indexStop = min(int((pixelBatchIndex + 1) * batchSize), int(pixelAmount));
-		for (uint pixelIndex = pixelBatchIndex * batchSize; pixelIndex < indexStop; pixelIndex++)
+		for (uint col = tileOffsetX; col < stopX; col++)
 		{
-			uint row = pixelIndex / vp.width();
-			uint col = pixelIndex % vp.width();
-			Vec3 colour;
-			for (uint i = 0; i < samplesPerPixel; i++)
+			Real u = Real(col);
+			Real v = Real(row);
+			if (samplesPerPixel > 1)
 			{
-				Real u = Real(col + uniformRand()) / vp.width();
-				Real v = Real(row + uniformRand()) / vp.height();
-				Ray r = camera.getRay(u, v);
+				u += uniformRand();
+				v += uniformRand();
+			}
+			else
+			{
+				u += 0.5;
+				v += 0.5;
+			}
+			u *= vp.widthInv();
+			v *= vp.heightInv();
+			Ray r = camera.getRay(u, v);
+			Vec3 colour = getColour(r, scene);
+
+			for (uint i = 1; i < samplesPerPixel; i++)
+			{
+				u = Real(col + uniformRand()) * vp.widthInv();
+				v = Real(row + uniformRand()) * vp.heightInv();
+				r = camera.getRay(u, v);
 				colour += getColour(r, scene);
 			}
+
 			colour /= samplesPerPixel;
 			colour = 255.99 * gammaCorrect(colour);
 
 			framebuffer.store(int(col), int(row), colour);
 		}
+	}
+}
 
-		pixelBatchIndex = counter++;
+void Raytracer::renderTiles(const Camera &camera, const Scene &scene, const Viewport &vp, std::atomic<uint> &counter, Framebuffer<Vec3> &framebuffer) const
+{
+	constexpr uint tileSize = 16;
+	uint tilesX = (vp.width() + tileSize - 1) / tileSize;
+	uint tilesY = (vp.height() + tileSize - 1) / tileSize;
+	uint tileAmount = tilesX * tilesY;
+	while (true)
+	{
+		uint tileIndex = counter++;
+		if (tileIndex >= tileAmount)
+			break;
+
+		uint tileY = tileIndex / tilesX;
+		uint tileX = tileIndex % tilesX;
+
+		renderTile(camera, scene, vp, tileX, tileY, tileSize, framebuffer);
 	}
 }
 
@@ -144,11 +177,11 @@ void Raytracer::render(const Scene &scene, const Camera &camera, Framebuffer<Vec
 	Camera myCamera = camera;
 	if (visualiseDepth || visualiseBounces)
 		myCamera.setDepthOfFieldEnabled(false);
-    
+
 	std::atomic<uint> renderPixelCounter {0};
 	const Viewport &viewport = myCamera.getViewport();
 
-	const uint nThreads = max(std::thread::hardware_concurrency(), 1) - 1;
+	const uint nThreads = max(std::thread::hardware_concurrency(), 1u) - 1;
 	std::future<void> futures[nThreads];
 	for (uint i = 0; i < nThreads; i++)
 		futures[i] = std::async(std::launch::async, &Raytracer::renderPixels, this, std::ref(myCamera), std::ref(scene), std::ref(viewport), std::ref(renderPixelCounter), std::ref(framebuffer));

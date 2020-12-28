@@ -13,7 +13,7 @@ namespace file
 {
 
 // By default (range <= 0) the maximum value is searched in the framebuffer during traversal.
-bool writePpm(const std::string& baseFileName, const Framebuffer<Vec3> &framebuffer, int range = -1)
+bool writePpm(const std::string& baseFileName, const Framebuffer &framebuffer, int range = -1)
 {
 	std::string fileName(baseFileName);
 	std::string extension(".ppm");
@@ -40,11 +40,13 @@ bool writePpm(const std::string& baseFileName, const Framebuffer<Vec3> &framebuf
 	file << "     \n";
 
 	int maxValue = max(1, range);
+	Real colourArray[3];
 	for (int row = int(height) - 1; row >= 0; row--)
 	{
 		for (int col = 0; col < int(width); col++)
 		{
-			Vec3 colour = framebuffer.load(col, row);
+			framebuffer.load(col, row, (byte*)colourArray);
+			Vec3 colour(colourArray[0], colourArray[1], colourArray[2]);
 			if (range <= 0)
 				maxValue = max(int(max(colour)), maxValue);
 			file << int(colour.r) << " " << int(colour.g) << " " << int(colour.b) << "\n";

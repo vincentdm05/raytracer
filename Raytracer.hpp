@@ -31,10 +31,10 @@ public:
 	Raytracer() {}
 
 	Vec3 getColour(const Ray &r, const Scene &scene, uint bounces = 0) const;
-	void renderTile(const Camera &camera, const Scene &scene, const Viewport &vp, uint tileX, uint tileY, uint tileSize, Framebuffer<Vec3> &framebuffer) const;
-	void renderTiles(const Camera &camera, const Scene &scene, const Viewport &vp, std::atomic<uint> &counter, Framebuffer<Vec3> &framebuffer) const;
-	void renderPixels(const Camera &camera, const Scene &scene, const Viewport &vp, std::atomic<uint> &counter, Framebuffer<Vec3> &framebuffer) const;
-	void render(const Scene &scene, const Camera &camera, Framebuffer<Vec3> &framebuffer) const;
+	void renderTile(const Camera &camera, const Scene &scene, const Viewport &vp, uint tileX, uint tileY, uint tileSize, Framebuffer &framebuffer) const;
+	void renderTiles(const Camera &camera, const Scene &scene, const Viewport &vp, std::atomic<uint> &counter, Framebuffer &framebuffer) const;
+	void renderPixels(const Camera &camera, const Scene &scene, const Viewport &vp, std::atomic<uint> &counter, Framebuffer &framebuffer) const;
+	void render(const Scene &scene, const Camera &camera, Framebuffer &framebuffer) const;
 	void setVisualiseDepth(bool value) { visualiseDepth = value; }
 	void setVisualiseBounces(bool value) { visualiseBounces = value; }
 	void setMaxBounces(uint n) { maxBounces = n; }
@@ -85,7 +85,7 @@ Vec3 Raytracer::getColour(const Ray &r, const Scene &scene, uint bounces) const
 	return scene.background().sample(r.direction());
 }
 
-void Raytracer::renderTile(const Camera &camera, const Scene &scene, const Viewport &vp, uint tileX, uint tileY, uint tileSize, Framebuffer<Vec3> &framebuffer) const
+void Raytracer::renderTile(const Camera &camera, const Scene &scene, const Viewport &vp, uint tileX, uint tileY, uint tileSize, Framebuffer &framebuffer) const
 {
 	uint tileOffsetX = tileX * tileSize;
 	uint tileOffsetY = tileY * tileSize;
@@ -124,12 +124,16 @@ void Raytracer::renderTile(const Camera &camera, const Scene &scene, const Viewp
 			colour /= samplesPerPixel;
 			colour = 255.99 * gammaCorrect(colour);
 
-			framebuffer.store(int(col), int(row), colour);
+			Real colourArray[3];
+			colourArray[0] = colour.r;
+			colourArray[1] = colour.g;
+			colourArray[2] = colour.b;
+			framebuffer.store(int(col), int(row), (byte*)colourArray);
 		}
 	}
 }
 
-void Raytracer::renderTiles(const Camera &camera, const Scene &scene, const Viewport &vp, std::atomic<uint> &counter, Framebuffer<Vec3> &framebuffer) const
+void Raytracer::renderTiles(const Camera &camera, const Scene &scene, const Viewport &vp, std::atomic<uint> &counter, Framebuffer &framebuffer) const
 {
 	constexpr uint tileSize = 16;
 	uint tilesX = (vp.width() + tileSize - 1) / tileSize;
@@ -148,7 +152,7 @@ void Raytracer::renderTiles(const Camera &camera, const Scene &scene, const View
 	}
 }
 
-void Raytracer::renderPixels(const Camera &camera, const Scene &scene, const Viewport &vp, std::atomic<uint> &counter, Framebuffer<Vec3> &framebuffer) const
+void Raytracer::renderPixels(const Camera &camera, const Scene &scene, const Viewport &vp, std::atomic<uint> &counter, Framebuffer &framebuffer) const
 {
 	uint pixelAmount = vp.width() * vp.height();
 	while (true)
@@ -187,11 +191,15 @@ void Raytracer::renderPixels(const Camera &camera, const Scene &scene, const Vie
 		colour /= samplesPerPixel;
 		colour = 255.99 * gammaCorrect(colour);
 
-		framebuffer.store(int(col), int(row), colour);
+		Real colourArray[3];
+		colourArray[0] = colour.r;
+		colourArray[1] = colour.g;
+		colourArray[2] = colour.b;
+		framebuffer.store(int(col), int(row), (byte*)colourArray);
 	}
 }
 
-void Raytracer::render(const Scene &scene, const Camera &camera, Framebuffer<Vec3> &framebuffer) const
+void Raytracer::render(const Scene &scene, const Camera &camera, Framebuffer &framebuffer) const
 {
 	Camera myCamera = camera;
 	if (visualiseDepth || visualiseBounces)

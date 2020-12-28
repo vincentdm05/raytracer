@@ -3,78 +3,140 @@
 #include "Common.hpp"
 
 #include "Math.hpp"
-#include "Viewport.hpp"
 
-#include <fstream>
-#include <iostream>
-#include <string>
+#include <cstring>
 
-template <typename DataType>
+enum FramebufferFormat
+{
+	// How to read:
+	// FBFormat_AX[BY[CZ[DW]]]F
+	// Where A, B, C and D are channel names (e.g. r, g, b or a)
+	// X, Y, Z and W are channel lengths (e.g. 8, 16 or 32)
+	// F is the underlying format. See below:
+	// f: floating point
+	// ui: unsigned integer
+	// si: signed integer
+	// un: unsigned normalized [0, 1]
+	// sn: signed normalized [-1, 1]
+
+	FBFormat_Invalid,
+
+	// TODO: add support for more formats
+	// 32 bits per channel
+	// 1 channel
+	FBFormat_r32f,
+	FBFormat_r32ui,
+	FBFormat_r32si,
+	FBFormat_r32un,
+	FBFormat_r32sn,
+
+	// 3 channels
+	FBFormat_r32g32b32f,
+	FBFormat_r32g32b32ui,
+	FBFormat_r32g32b32si,
+	FBFormat_r32g32b32un,
+	FBFormat_r32g32b32sn,
+};
+
+// Descriptor for the framebuffer construction
+struct FramebufferDesc
+{
+	uint width = 1;
+	uint height = 1;
+	FramebufferFormat format = FBFormat_r32f;
+};
+
 class Framebuffer
 {
 private:
 	uint width = 0;
 	uint height = 0;
-	DataType *data = nullptr;
+	uint pixelSizeInBytes = 0;
+	uint dataSize = 0;
+	FramebufferFormat format = FBFormat_Invalid;
+	byte *data = nullptr;
 
 	uint positionToIndex(int x, int y) const;
+	uint channelAmount();
+	uint getPixelSizeInBytes();
 
 public:
-	Framebuffer(const Viewport &vp);
+	Framebuffer(const FramebufferDesc &desc);
 	~Framebuffer() { delete[] data; }
 
 	uint getWidth() const { return width; }
 	uint getHeight() const { return height; }
-	void store(int x, int y, const DataType &value);
-	void blend(int x, int y, const DataType &value);
-	DataType load(int x, int y) const;
-	DataType sample(Real u, Real v) const;
+	void store(int x, int y, const byte *in);
+	void load(int x, int y, byte *out) const;
 };
 
-template <typename DataType>
-uint Framebuffer<DataType>::positionToIndex(int x, int y) const
+uint Framebuffer::positionToIndex(int x, int y) const
 {
 	// TODO: ordering, e.g. Morton
 	x = clamp(x, 0, width - 1);
 	y = clamp(y, 0, height - 1);
-	return uint(x + y * width);
+	return uint(x + y * width) * pixelSizeInBytes;
 }
 
-template <typename DataType>
-Framebuffer<DataType>::Framebuffer(const Viewport &vp)
+uint Framebuffer::channelAmount()
 {
-	width = max(vp.width(), 1u);
-	height = max(vp.height(), 1u);
-	data = new DataType[width * height]();
+	uint amount = 0;
+	if (format > FBFormat_Invalid)
+		amount += 1;
+	if (format > FBFormat_r32sn)
+		amount += 2;
+
+	return amount;
 }
 
-template <typename DataType>
-void Framebuffer<DataType>::store(int x, int y, const DataType &value)
+uint Framebuffer::getPixelSizeInBytes()
+{
+	if (pixelSizeInBytes)
+		return pixelSizeInBytes;
+
+	if (format == FBFormat_r32f ||
+		format == FBFormat_r32g32b32f)
+	{
+		pixelSizeInBytes = sizeof(float);
+	}
+	else if (format == FBFormat_r32ui ||
+		format == FBFormat_r32g32b32ui ||
+		format == FBFormat_r32un ||
+		format == FBFormat_r32g32b32un)
+	{
+		pixelSizeInBytes = sizeof(uint);
+	}
+	else if (format == FBFormat_r32si ||
+		format == FBFormat_r32g32b32si ||
+		format == FBFormat_r32sn ||
+		format == FBFormat_r32g32b32sn)
+	{
+		pixelSizeInBytes = sizeof(int);
+	}
+
+	pixelSizeInBytes *= channelAmount();
+
+	return pixelSizeInBytes;
+}
+
+Framebuffer::Framebuffer(const FramebufferDesc &desc)
+{
+	width = max(desc.width, 1u);
+	height = max(desc.height, 1u);
+	format = desc.format;
+
+	dataSize = getPixelSizeInBytes() * width * height;
+	data = new byte[dataSize]();
+}
+
+void Framebuffer::store(int x, int y, const byte *in)
 {
 	uint index = positionToIndex(x, y);
-	data[index] = value;
+	std::memcpy(&data[index], in, pixelSizeInBytes);
 }
 
-template <typename DataType>
-void Framebuffer<DataType>::blend(int x, int y, const DataType &value)
+void Framebuffer::load(int x, int y, byte *out) const
 {
 	uint index = positionToIndex(x, y);
-	// TODO: blend functions
-	data[index] += value;
-}
-
-template <typename DataType>
-DataType Framebuffer<DataType>::load(int x, int y) const
-{
-	uint index = positionToIndex(x, y);
-	return data[index];
-}
-
-template <typename DataType>
-DataType Framebuffer<DataType>::sample(Real u, Real v) const
-{
-	// TODO: filtering
-	int x = int(round(u * width));
-	int y = int(round(v * height));
-	return load(x, y);
+	std::memcpy(out, &data[index], pixelSizeInBytes);
 }

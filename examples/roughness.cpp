@@ -13,7 +13,11 @@
 int main(int argc, char *argv[])
 {
 	Viewport viewport(900, 110);
-	Framebuffer<Vec3> framebuffer(viewport);
+	FramebufferDesc fbDesc;
+	fbDesc.width = viewport.width();
+	fbDesc.height = viewport.height();
+	fbDesc.format = FramebufferFormat::FBFormat_r32g32b32f;
+	Framebuffer framebuffer(fbDesc);
 
 	Vec3 cameraPosition(0.0, 1.0, 11.8);
 	Vec3 focusPosition(0, 0, -1);

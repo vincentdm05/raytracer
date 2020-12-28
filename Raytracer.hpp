@@ -55,7 +55,9 @@ Vec3 Raytracer::getColour(const Ray &r, const Scene &scene, uint bounces) const
 	// Visualisations hijack the recursion train
 	if (visualiseDepth)
 	{
-		return Vec3(1, 1, 1) / (1.0 + rec.t);
+		if (hit)
+			return Vec3(1, 1, 1) / (1.0 + rec.t);
+		return Vec3();
 	}
 	else if (visualiseBounces)
 	{

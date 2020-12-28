@@ -159,14 +159,31 @@ void Raytracer::renderPixels(const Camera &camera, const Scene &scene, const Vie
 
 		uint row = pixelIndex / vp.width();
 		uint col = pixelIndex % vp.width();
-		Vec3 colour;
-		for (uint i = 0; i < samplesPerPixel; i++)
+		Real u = Real(col);
+		Real v = Real(row);
+		if (samplesPerPixel > 1)
 		{
-			Real u = Real(col + uniformRand()) / vp.width();
-			Real v = Real(row + uniformRand()) / vp.height();
-			Ray r = camera.getRay(u, v);
+			u += uniformRand();
+			v += uniformRand();
+		}
+		else
+		{
+			u += 0.5;
+			v += 0.5;
+		}
+		u /= vp.width();
+		v /= vp.height();
+		Ray r = camera.getRay(u, v);
+		Vec3 colour = getColour(r, scene);
+
+		for (uint i = 1; i < samplesPerPixel; i++)
+		{
+			u = Real(col + uniformRand()) / vp.width();
+			v = Real(row + uniformRand()) / vp.height();
+			r = camera.getRay(u, v);
 			colour += getColour(r, scene);
 		}
+
 		colour /= samplesPerPixel;
 		colour = 255.99 * gammaCorrect(colour);
 

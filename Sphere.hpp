@@ -11,7 +11,6 @@ class Sphere : public Hitable
 private:
 	Vec3 center;
 	Real radius = 1.0;
-	const Material *material = nullptr;
 
 public:
 	Sphere() {}

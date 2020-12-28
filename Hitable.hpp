@@ -17,6 +17,9 @@ struct HitRecord
 
 class Hitable
 {
+protected:
+	const Material *material = nullptr;
+
 public:
 	virtual ~Hitable() {}
 

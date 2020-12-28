@@ -36,6 +36,7 @@ public:
 	inline Vec3 &operator=(Vec3 && v) { x = std::move(v.x); y = std::move(v.y); z = std::move(v.z); return *this; }
 
 	inline bool operator==(const Vec3 &v) const { return x == v.x && y == v.y && z == v.z; }
+	inline bool operator!=(const Vec3 &v) const { return x != v.x || y != v.y || z != v.z; }
 
 	inline const Vec3 &operator+() const { return *this; }
 	inline Vec3 operator-() const { return Vec3(-x, -y, -z); }

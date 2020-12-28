@@ -8,19 +8,22 @@ class Material;
 
 class Sphere : public Hitable
 {
-private:
-	Vec3 center;
-	Real radius = 1.0;
-
 public:
 	Sphere() {}
-	Sphere(const Vec3 &_center, Real _radius, const Material &_material) { center = _center; radius = _radius; material = &_material; }
+	Sphere(const Vec3 &center, Real radius, const Material &_material)
+	{
+		transform.setTranslation(center);
+		transform.setScale(radius);
+		material = &_material;
+	}
 
 	virtual bool hit(const Ray &r, Real minDist, Real maxDist, HitRecord &rec) const;
 };
 
 bool Sphere::hit(const Ray &r, Real minDist, Real maxDist, HitRecord &rec) const
 {
+	Vec3 center = transform.translation();
+	Real radius = transform.scale();
 	Vec3 oc = r.origin() - center;
 	Real a = dot(r.direction(), r.direction());
 	Real b = dot(oc, r.direction());

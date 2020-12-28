@@ -3,6 +3,7 @@
 #include "Common.hpp"
 
 #include "Ray.hpp"
+#include "Transform.hpp"
 #include "Vec3.hpp"
 
 class Material;
@@ -18,6 +19,7 @@ struct HitRecord
 class Hitable
 {
 protected:
+	Transform transform;
 	const Material *material = nullptr;
 
 public:

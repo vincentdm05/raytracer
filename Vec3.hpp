@@ -4,8 +4,9 @@
 
 #include "Math.hpp"
 
+#include <cassert>
+#include <cmath>
 #include <iostream>
-#include <math.h>
 
 class Vec3
 {
@@ -124,9 +125,8 @@ inline Vec3 &Vec3::operator/=(Real c)
 inline Vec3 &Vec3::normalize()
 {
 	Real l = length();
-	if (l == 0)
-		throw "Zero vector can't be normalized";
-	*this /= l;
+	if (l != 0)
+		*this /= l;
 	return *this;
 }
 
@@ -246,9 +246,9 @@ inline Vec3 cross(const Vec3 &a, const Vec3 &b)
 inline Vec3 normalize(const Vec3 &v)
 {
 	Real l = v.length();
-	if (l == 0)
-		throw "Zero vector can't be normalized";
-	return v / l;
+	if (l != 0)
+		return v / l;
+	return v;
 }
 
 inline Vec3 sqrt(const Vec3 &v)

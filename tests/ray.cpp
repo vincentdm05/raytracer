@@ -1,9 +1,13 @@
 #include "../Common.hpp"
 
+#ifdef NDEBUG
+#undef NDEBUG
+#endif
+
 #include "../Ray.hpp"
 #include "../Vec3.hpp"
 
-#include <assert.h>
+#include <cassert>
 #include <iostream>
 
 int main()

@@ -1,8 +1,12 @@
 #include "../Common.hpp"
 
+#ifdef NDEBUG
+#undef NDEBUG
+#endif
+
 #include "../Vec3.hpp"
 
-#include <assert.h>
+#include <cassert>
 #include <iostream>
 
 int main()
@@ -54,30 +58,14 @@ int main()
 	assert(dot(c, c) == c.squaredLength());
 	assert(cross(Vec3(1, 0, 0), Vec3(0, 1, 0)) == Vec3(0, 0, 1));
 	assert(normalize(Vec3(4, 9, 16)).length() == 1);
+	assert(Vec3(0, 0, 0).normalize() == Vec3(0, 0, 0));
+	assert(normalize(Vec3(0, 0, 0)) == Vec3(0, 0, 0));
 	assert(sqrt(Vec3(4, 9, 16)) == Vec3(2, 3, 4));
 
 	assert(reflect(Vec3(1, -1, 0), Vec3(0, 1, 0)) == Vec3(1, 1, 0));
 	Vec3 d;
 	assert(refract(Vec3(1, -1, 0), Vec3(0, 1, 0), 1, d));
 	assert(d == Vec3(1, -1, 0));
-
-	try
-	{
-		Vec3 z;
-		z.normalize();
-		assert(0 && "Zero vector normalization should have thrown an error.");
-	}
-	catch (const char *msg)
-	{}
-
-	try
-	{
-		Vec3 z;
-		normalize(z);
-		assert(0 && "Zero vector normalization should have thrown an error.");
-	}
-	catch (const char *msg)
-	{}
 
 	std::cout << "All tests passed!" << std::endl;
 

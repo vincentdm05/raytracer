@@ -7,7 +7,8 @@
 #include "../Framebuffer.hpp"
 #include "../Lambertian.hpp"
 #include "../Metal.hpp"
-#include "../Raytracer.hpp"
+#include "../Raytrace.hpp"
+#include "../Renderer.hpp"
 #include "../Scene.hpp"
 #include "../Sphere.hpp"
 #include "../Vec3.hpp"
@@ -72,8 +73,10 @@ int main(int argc, char *argv[])
 	for (Hitable *hitable : objects)
 		scene.add(*hitable);
 
-	Raytracer raytracer;
-	raytracer.render(scene, camera, framebuffer);
+	Raytrace raytrace(scene, camera, viewport, framebuffer);
+	Renderer renderer;
+	renderer.render(raytrace);
+
 	file::writePpm(argv[argc > 1 ? 1 : 0], framebuffer, 255);
 
 	for (Hitable *hitable : objects)

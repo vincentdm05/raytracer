@@ -24,7 +24,7 @@ private:
 public:
 	Camera(const Vec3 &_position, const Vec3 &_direction, const Vec3 &_up, Real fovY, const Viewport &_viewport, Real aperture, Real focus);
 	
-	Ray getRay(Real u, Real v) const;
+	Ray getRay(Real u, Real v, bool useDepthOfField = true) const;
 	const Viewport &getViewport() const { return viewport; }
 	void setDepthOfFieldEnabled(bool value) { depthOfFieldEnabled = value; }
 };
@@ -48,10 +48,10 @@ Camera::Camera(const Vec3 &_position, const Vec3 &_direction, const Vec3 &_up, R
 	vertical = 2.0 * halfHeight * focus * up;
 }
 
-Ray Camera::getRay(Real u, Real v) const
+Ray Camera::getRay(Real u, Real v, bool useDepthOfField) const
 {
 	Vec3 start = position;
-	if (depthOfFieldEnabled)
+	if (depthOfFieldEnabled && useDepthOfField)
 	{
 		Vec3 sample = lensRadius * sampleUnitDisk();
 		Vec3 offset = right * sample.x + up * sample.y;

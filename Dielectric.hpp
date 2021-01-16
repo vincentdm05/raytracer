@@ -10,18 +10,20 @@
 class Dielectric : public Material
 {
 private:
-	Real refractiveIndex;
+	Vec3 albedo = Vec3(1.0, 1.0, 1.0);
+	Real refractiveIndex = 1.5;
 
 public:
-	Dielectric() { refractiveIndex = 1.5; }
+	Dielectric() {}
 	Dielectric(Real _refractiveIndex) { refractiveIndex = _refractiveIndex; }
+	Dielectric(const Vec3 &_albedo, Real _refractiveIndex) { albedo = _albedo; refractiveIndex = _refractiveIndex; }
 
 	virtual bool scatter(const Ray &rIn, const HitRecord &hr, Vec3 &attenuation, Ray &scattered) const;
 };
 
 bool Dielectric::scatter(const Ray &rIn, const HitRecord &hr, Vec3 &attenuation, Ray &scattered) const
 {
-	attenuation = Vec3(1, 1, 1);
+	attenuation = albedo;
 
 	Vec3 v = rIn.direction();
 	Vec3 n;

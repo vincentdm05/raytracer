@@ -227,6 +227,21 @@ inline Vec3 abs(const Vec3 &v)
 	return Vec3(abs(v.x), abs(v.y), abs(v.z));
 }
 
+inline bool all(const Vec3 &v)
+{
+	return v.x && v.y && v.z;
+}
+
+inline bool any(const Vec3 &v)
+{
+	return v.x || v.y || v.z;
+}
+
+inline Vec3 sign(const Vec3 &v)
+{
+	return Vec3(v.x > 0 ? 1 : -1, v.y > 0 ? 1 : -1, v.z > 0 ? 1 : -1);
+}
+
 inline Vec3 lerp(const Vec3 &a, const Vec3 &b, Real t)
 {
 	t = clamp(t, 0.0, 1.0);

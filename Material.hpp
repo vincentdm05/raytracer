@@ -12,6 +12,7 @@ public:
 	virtual ~Material() {}
 
 	virtual bool scatter(const Ray &rIn, const HitRecord &hr, Vec3 &attenuation, Ray &scattered) const = 0;
+	virtual Vec3 emitted(const Vec3 &p) const { return Vec3(); }
 };
 
 Real schlick(Real cosine, Real refractionIndex)

@@ -52,10 +52,11 @@ Vec3 Raytrace::getColour(const Ray &r, const Scene &scene, uint bounces) const
 	{
 		Ray scattered;
 		Vec3 attenuation;
+		Vec3 emission = rec.material ? rec.material->emitted(rec.point) : Vec3();
 		if (bounces < maxBounces && rec.material && rec.material->scatter(r, rec, attenuation, scattered))
-			return getColour(scattered, scene, bounces + 1) * attenuation;
+			return emission + getColour(scattered, scene, bounces + 1) * attenuation;
 		else
-			return Vec3();
+			return emission;
 	}
 
 	return scene.background().sample(r.direction());

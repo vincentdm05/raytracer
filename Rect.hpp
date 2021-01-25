@@ -44,7 +44,7 @@ bool Rect::hit(const Ray &r, Real minDist, Real maxDist, HitRecord &rec) const
 
 	rec.t = t * transform.scale();
 	rec.point = r.to(rec.t);
-	rec.normal = rotate(Vec3(0, 0, 1), transform.rotation());;
+	rec.normal = rotate(Vec3(0.0, 0.0, ray.direction().z > 0.0 ? -1.0 : 1.0), transform.rotation());;
 	rec.material = material;
 
 	return true;

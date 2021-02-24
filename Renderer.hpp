@@ -73,7 +73,7 @@ void Renderer::renderPixels(const PixelRenderer &pixelRenderer, std::atomic<uint
 		uint row = pixelIndex / vp.width();
 		uint col = pixelIndex % vp.width();
 
-		pixelRenderer.renderPixel(row, col);
+		pixelRenderer.renderPixel(col, row);
 	}
 }
 

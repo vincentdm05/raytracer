@@ -2,26 +2,42 @@
 
 #include "Common.hpp"
 
+#include "ConstantTexture.hpp"
 #include "Material.hpp"
 #include "Math.hpp"
 #include "Sampling.hpp"
+#include "Texture.hpp"
 
 class Lambertian : public Material
 {
 private:
-	Vec3 albedo;
+	const Texture *texture = nullptr;
+	bool ownedTexture = false;
 
 public:
-	Lambertian() { albedo = Vec3(0.5, 0.5, 0.5); }
-	Lambertian(const Vec3 &_albedo) { albedo = _albedo; }
+	Lambertian(const Vec3 &albedo);
+	Lambertian(const Texture &_texture) { texture = &_texture; }
+	~Lambertian();
 
 	virtual bool scatter(const Ray &rIn, const HitRecord &hr, Vec3 &attenuation, Ray &scattered) const;
 };
+
+Lambertian::Lambertian(const Vec3 &albedo)
+{
+	texture = new ConstantTexture(albedo);
+	ownedTexture = true;
+}
+
+Lambertian::~Lambertian()
+{
+	if (ownedTexture)
+		delete texture;
+}
 
 bool Lambertian::scatter(const Ray &rIn, const HitRecord &hr, Vec3 &attenuation, Ray &scattered) const
 {
 	Vec3 lambertianOut = hr.normal + sampleUnitSphere();
 	scattered = Ray(hr.point, lambertianOut);
-	attenuation = albedo;
+	attenuation = texture->sample(hr.point);
 	return true;
 }

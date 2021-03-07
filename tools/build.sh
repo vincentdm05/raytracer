@@ -2,18 +2,19 @@
 
 usage()
 {
-	echo "usage: $0 project_name [-h|--help] [-b|--build-dir build_dir]"
-	echo "  project_name is the name of a .cpp file with entry point and its location."
+	echo "usage: $0 project_name [-h|--help] [-b|--bin-dir bin_dir]"
+	echo "  project_name is the name of a .cpp file with entry point and its location. If a Makefile"
+	echo "  is located next to project_name, it will be used to build the project."
 	echo "output: the name of the successfully built executable, or an error message in stderr."
 	echo "options:"
 	echo "  -h, --help                 Prints this message."
-	echo "  -b, --build-dir build_dir  Specifies where built binaries will be located. By default"
+	echo "  -b, --bin-dir bin_dir      Specifies where built binaries will be located. By default"
 	echo "    they are written to a new folder called 'bin' under the project's location."
 }
 
 absolute_path()
 {
-	( cd "$1" ; pwd )
+	( cd "$1" && pwd -P || echo "$1" )
 }
 
 # Strip of path and extension
@@ -27,7 +28,7 @@ barename()
 
 needHelp=0
 projectName=
-buildDir=
+binDir=
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
@@ -37,8 +38,8 @@ while [[ $# -gt 0 ]]; do
 		needHelp=1
 		shift
 		;;
-		-b|--build-dir)
-		buildDir="$2"
+		-b|--bin-dir)
+		binDir="$2"
 		shift
 		shift
 		;;
@@ -66,13 +67,22 @@ fi
 # Extract path to project
 projectDir="$(absolute_path "$(dirname "$projectName")" )"
 
-# Default build directory to within project directory
-if [[ -z "$buildDir" ]]; then
-	buildDir="$projectDir"/bin
-fi
-
 # Strip projectName of path and extension
 projectName="$(barename "$projectName")"
+
+# Default binary directory to within project directory
+if [[ -z "$binDir" ]]; then
+	binDir="$projectDir"/bin
+fi
+
+# Find binary directory
+if [ ! -d "$binDir" ]; then
+	mkdir "$binDir" ||
+	exit 1
+fi
+binDir="$(absolute_path "$binDir")"
+
+outputFile="${binDir}/${projectName}"
 
 # Find source file
 projectSrc="${projectDir}/${projectName}.cpp"
@@ -81,19 +91,15 @@ if [ ! -f "$projectSrc" ]; then
 	exit 1
 fi
 
-# Find build directory
-if [ ! -d "$buildDir" ]; then
-	mkdir "$buildDir" ||
-	exit 1
+if [ -f "${projectDir}/Makefile" ]; then
+	( cd "${projectDir}" && make >/dev/null )
+else
+	g++ -O3 -Wall -std=c++11 -o "$outputFile" "$projectSrc"
 fi
-buildDir="$(absolute_path "$buildDir")"
 
-outputFile="${buildDir}/${projectName}"
-
-g++ -O3 -Wall -std=c++11 -o "$outputFile" "$projectSrc"
 if [[ $? -eq 0 ]]; then
 	echo "$outputFile"
 else
-	echo "Could not build file ${outputFile}" 1>&2
+	echo "Could not build ${outputFile}" 1>&2
 	exit 1
 fi

@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Perform tests from tests/ directory
+cd "$(dirname "$0")"
+
 do_test()
 {
 	test="$1"
@@ -15,7 +18,7 @@ do_test()
 		return 1
 	fi
 
-	g++ -O3 -Wall -std=c++11 -o ../bin/"${test}"-test "${test}".cpp &&
+	g++ -O3 -Wall -std=c++11 -I ../ -o ../bin/"${test}"-test "${test}".cpp &&
 	echo "Testing ${test}" &&
 	../bin/"${test}"-test
 }

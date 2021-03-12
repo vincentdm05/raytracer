@@ -1,10 +1,10 @@
-#include "../Common.hpp"
+#include "Common.hpp"
 
 #ifdef NDEBUG
 #undef NDEBUG
 #endif
 
-#include "../Vec3.hpp"
+#include "Vec3.hpp"
 
 #include <cassert>
 #include <iostream>

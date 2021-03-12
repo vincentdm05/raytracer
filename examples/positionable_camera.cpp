@@ -1,15 +1,15 @@
-#include "../Common.hpp"
+#include "Common.hpp"
 
-#include "../Background.hpp"
-#include "../Camera.hpp"
-#include "../File.hpp"
-#include "../Framebuffer.hpp"
-#include "../Lambertian.hpp"
-#include "../Raytrace.hpp"
-#include "../Renderer.hpp"
-#include "../Scene.hpp"
-#include "../Sphere.hpp"
-#include "../Vec3.hpp"
+#include "Background.hpp"
+#include "Camera.hpp"
+#include "File.hpp"
+#include "Framebuffer.hpp"
+#include "Lambertian.hpp"
+#include "Raytrace.hpp"
+#include "Renderer.hpp"
+#include "Scene.hpp"
+#include "Sphere.hpp"
+#include "Vec3.hpp"
 
 int main(int argc, char *argv[])
 {

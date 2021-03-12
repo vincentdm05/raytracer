@@ -2,12 +2,13 @@
 
 usage()
 {
-	echo "usage: $0 project_name [-h|--help] [-b|--bin-dir bin_dir]"
+	echo "usage: $0 project_name [-h|--help] [-r|--root root_dir] [-b|--bin-dir bin_dir]"
 	echo "  project_name is the name of a .cpp file with entry point and its location. If a Makefile"
 	echo "  is located next to project_name, it will be used to build the project."
 	echo "output: the name of the successfully built executable, or an error message in stderr."
 	echo "options:"
 	echo "  -h, --help                 Prints this message."
+	echo "  -r, --root                 Specifies where included files are rooted."
 	echo "  -b, --bin-dir bin_dir      Specifies where built binaries will be located. By default"
 	echo "    they are written to a new folder called 'bin' under the project's location."
 }
@@ -27,6 +28,7 @@ barename()
 }
 
 needHelp=0
+rootDir=
 projectName=
 binDir=
 
@@ -36,6 +38,11 @@ while [[ $# -gt 0 ]]; do
 	case "$arg" in
 		-h|--help)
 		needHelp=1
+		shift
+		;;
+		-r|--root)
+		rootDir="$2"
+		shift
 		shift
 		;;
 		-b|--bin-dir)
@@ -62,6 +69,18 @@ if [[ -z "$projectName" ]]; then
 	fi
 	usage
 	exit $exitCode
+fi
+
+toolDir="$(absolute_path "$(dirname "$0")" )"
+
+# Default root directory to parent of tools folder
+if [[ -z "${rootDir}" ]]; then
+	rootDir="$toolDir"/..
+fi
+
+if [[ ! -d "${rootDir}" ]]; then
+	echo "Root directory ${rootDir} doesn't exist" 1>&2
+	exit 1
 fi
 
 # Extract path to project
@@ -94,7 +113,7 @@ fi
 if [ -f "${projectDir}/Makefile" ]; then
 	( cd "${projectDir}" && make >/dev/null )
 else
-	g++ -O3 -Wall -std=c++11 -o "$outputFile" "$projectSrc"
+	g++ -O3 -Wall -std=c++11 -I "${rootDir}" -o "$outputFile" "$projectSrc"
 fi
 
 if [[ $? -eq 0 ]]; then

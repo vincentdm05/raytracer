@@ -147,8 +147,8 @@ void Renderer::makeGrid(uint width, uint height)
 	// Center spiral grid, starting left, then up
 	const int leftBound = -int(width) / 2;
 	const int rightBound = int(width + 1) / 2;
-	const int topBound = int(height + 1) / 2;
-	const int bottomBound = -int(height) / 2;
+	const int topBound = int(height) / 2;
+	const int bottomBound = -int(height - 1) / 2;
 	int x = 0;
 	int y = 0;
 	int dx = 0;
@@ -159,7 +159,7 @@ void Renderer::makeGrid(uint width, uint height)
 	for (uint i = 0; i < maxSize; i++)
 	{
 		// Within bounds
-		if (x >= leftBound && x < rightBound && y >= bottomBound && y < topBound)
+		if (x >= leftBound && x < rightBound && y >= bottomBound && y <= topBound)
 		{
 			uint gridXY = (((y - bottomBound) & 0xffff) << 16) | ((x - leftBound) & 0xffff);
 			indexToGridMap[mapIndex++] = gridXY;

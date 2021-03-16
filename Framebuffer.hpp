@@ -4,7 +4,7 @@
 
 #include "Math.hpp"
 
-#include <cstring>
+#include <cstring>	// For memcpy
 
 enum FramebufferFormat
 {
@@ -51,13 +51,14 @@ class Framebuffer
 private:
 	uint width = 0;
 	uint height = 0;
+	Real aspectRatio = 0.0;
 	uint pixelSizeInBytes = 0;
 	uint dataSize = 0;
 	FramebufferFormat format = FBFormat_Invalid;
 	byte *data = nullptr;
 
 	uint positionToIndex(int x, int y) const;
-	uint channelAmount();
+	uint channelAmount() const;
 	uint getPixelSizeInBytes();
 
 public:
@@ -66,6 +67,8 @@ public:
 
 	uint getWidth() const { return width; }
 	uint getHeight() const { return height; }
+	Real getAspectRatio() const { return aspectRatio; }
+	const byte *getData() const { return data; }
 	void store(int x, int y, const byte *in);
 	void load(int x, int y, byte *out) const;
 };
@@ -78,7 +81,7 @@ uint Framebuffer::positionToIndex(int x, int y) const
 	return uint(x + y * width) * pixelSizeInBytes;
 }
 
-uint Framebuffer::channelAmount()
+uint Framebuffer::channelAmount() const
 {
 	uint amount = 0;
 	if (format > FBFormat_Invalid)
@@ -123,6 +126,7 @@ Framebuffer::Framebuffer(const FramebufferDesc &desc)
 {
 	width = max(desc.width, 1u);
 	height = max(desc.height, 1u);
+	aspectRatio = Real(width) / Real(height);
 	format = desc.format;
 
 	dataSize = getPixelSizeInBytes() * width * height;

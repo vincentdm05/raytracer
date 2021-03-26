@@ -106,8 +106,7 @@ PlatformBackendGLFW::PlatformBackendGLFW(uint _windowWidth, uint _windowHeight, 
 
 PlatformBackendGLFW::~PlatformBackendGLFW()
 {
-	if (window)
-		end();
+	end();
 }
 
 bool PlatformBackendGLFW::init()
@@ -144,10 +143,17 @@ bool PlatformBackendGLFW::init()
 
 bool PlatformBackendGLFW::end()
 {
-	glfwDestroyWindow(window);
-	glfwTerminate();
+	if (window)
+	{
+		glfwDestroyWindow(window);
+		window = nullptr;
 
-	return true;
+		glfwTerminate();
+
+		return true;
+	}
+
+	return false;
 }
 
 bool PlatformBackendGLFW::isLive() const

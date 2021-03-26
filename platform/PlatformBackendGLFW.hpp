@@ -4,6 +4,7 @@
 
 #include <GLFW/glfw3.h>
 
+#include <iostream>
 #include <string>
 
 // NOTE: dependency to GLFW
@@ -15,6 +16,7 @@ private:
 	uint windowHeight = 0;
 	std::string windowName;
 
+	static void errorCallback(int errorCode, const char *errorMessage);
 	static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 public:
@@ -29,6 +31,65 @@ public:
 	virtual void getFramebufferSize(uint &widthOut, uint &heightOut) override;
 };
 
+void PlatformBackendGLFW::errorCallback(int errorCode, const char *errorMessage)
+{
+	std::string errorName;
+	switch (errorCode)
+	{
+		case GLFW_NOT_INITIALIZED:
+		{
+			errorName = "GLFW_NOT_INITIALIZED";
+			break;
+		}
+		case GLFW_NO_CURRENT_CONTEXT:
+		{
+			errorName = "GLFW_NO_CURRENT_CONTEXT";
+			break;
+		}
+		case GLFW_INVALID_ENUM :
+		{
+			errorName = "GLFW_INVALID_ENUM ";
+			break;
+		}
+		case GLFW_INVALID_VALUE:
+		{
+			errorName = "GLFW_INVALID_VALUE";
+			break;
+		}
+		case GLFW_OUT_OF_MEMORY:
+		{
+			errorName = "GLFW_OUT_OF_MEMORY";
+			break;
+		}
+		case GLFW_API_UNAVAILABLE:
+		{
+			errorName = "GLFW_API_UNAVAILABLE";
+			break;
+		}
+		case GLFW_VERSION_UNAVAILABLE:
+		{
+			errorName = "GLFW_VERSION_UNAVAILABLE";
+			break;
+		}
+		case GLFW_PLATFORM_ERROR:
+		{
+			errorName = "GLFW_PLATFORM_ERROR";
+			break;
+		}
+		case GLFW_FORMAT_UNAVAILABLE:
+		{
+			errorName = "GLFW_FORMAT_UNAVAILABLE";
+			break;
+		}
+		default:
+		{
+			errorName = "Unrecognized error";
+		}
+	};
+
+	std::cerr << "[GLFW Platform Backend] ERROR (" << errorName << "): " << errorMessage << std::endl;
+}
+
 void PlatformBackendGLFW::keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
 	if (action == GLFW_PRESS && key == GLFW_KEY_ESCAPE)
@@ -39,7 +100,9 @@ PlatformBackendGLFW::PlatformBackendGLFW(uint _windowWidth, uint _windowHeight, 
 : windowWidth(_windowWidth)
 , windowHeight(_windowHeight)
 , windowName(_windowName)
-{}
+{
+	glfwSetErrorCallback(errorCallback);
+}
 
 PlatformBackendGLFW::~PlatformBackendGLFW()
 {
@@ -50,7 +113,10 @@ PlatformBackendGLFW::~PlatformBackendGLFW()
 bool PlatformBackendGLFW::init()
 {
 	if (!glfwInit())
+	{
+		std::cerr << "Unable to init GLFW." << std::endl;
 		return false;
+	}
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
@@ -63,6 +129,7 @@ bool PlatformBackendGLFW::init()
 	if (window == nullptr)
 	{
 		glfwTerminate();
+		std::cerr << "Unable to create window." << std::endl;
 		return false;
 	}
 

@@ -42,9 +42,53 @@ bool GpuBackendOpenGL::checkGLErrors(const std::string &contextString) const
 	while ((errorCode = glGetError()) != GL_NO_ERROR)
 	{
 		noError = false;
-		std::cerr << "[OpenGL GPU Backend] ERROR" <<
-		(contextString.empty() ? "" : " in ") <<
-		contextString << ": code 0x" << std::hex << errorCode << std::dec << std::endl;
+
+		std::string errorName;
+		switch (errorCode)
+		{
+			case GL_INVALID_ENUM:
+			{
+				errorName = "GL_INVALID_ENUM";
+				break;
+			}
+			case GL_INVALID_VALUE:
+			{
+				errorName = "GL_INVALID_VALUE";
+				break;
+			}
+			case GL_INVALID_OPERATION:
+			{
+				errorName = "GL_INVALID_OPERATION";
+				break;
+			}
+			case GL_INVALID_FRAMEBUFFER_OPERATION:
+			{
+				errorName = "GL_INVALID_FRAMEBUFFER_OPERATION";
+				break;
+			}
+			case GL_OUT_OF_MEMORY:
+			{
+				errorName = "GL_OUT_OF_MEMORY";
+				break;
+			}
+			case GL_STACK_UNDERFLOW:
+			{
+				errorName = "GL_STACK_UNDERFLOW";
+				break;
+			}
+			case GL_STACK_OVERFLOW:
+			{
+				errorName = "GL_STACK_OVERFLOW";
+				break;
+			}
+			default:
+			{
+				errorName = "Unrecognized error";
+			}
+		};
+
+		std::cerr << "[OpenGL GPU Backend] ERROR (" << errorName << ")" <<
+		(contextString.empty() ? "" : " in ") << contextString << std::endl;
 	}
 
 	return noError;

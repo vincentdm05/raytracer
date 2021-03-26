@@ -13,12 +13,10 @@
 class GpuBackendOpenGL : public GpuBackend
 {
 private:
-	GLuint shaderHandle = 0;
-	GLuint vertHandle = 0;
-	GLuint fragHandle = 0;
+	GLuint resolveShaderHandle = 0;
 	GLuint displayTexture = 0;
-	GLint attribLocationTex = 0;
-	GLint attribLocationTexScale = 0;
+	GLint resolveAttribLocationTex = 0;
+	GLint resolveAttribLocationTexScale = 0;
 
 	bool checkGLErrors(const std::string &contextString = "") const;
 	bool checkShader(GLuint handle, const char *shaderName) const;
@@ -138,7 +136,7 @@ bool GpuBackendOpenGL::init()
 	if (glewInit() != GLEW_OK)
 		return false;
 
-	const GLchar* vertexShader =
+	const GLchar *vertexShader =
 		"#version 410\n"
 		"out vec2 texCoord;\n"
 		"void main()\n"
@@ -150,13 +148,13 @@ bool GpuBackendOpenGL::init()
 		"	gl_Position = vec4(x, y, 0.0, 1.0);\n"
 		"}\n";
 
-	vertHandle = glCreateShader(GL_VERTEX_SHADER);
+	GLuint vertHandle = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertHandle, 1, &vertexShader, nullptr);
 	glCompileShader(vertHandle);
 	if (!checkShader(vertHandle, "vertex shader"))
 		return false;
 
-	const GLchar* fragmentShader =
+	const GLchar *fragmentShader =
 		"#version 410\n"
 		"in vec2 texCoord;\n"
 		"uniform sampler2D Texture;\n"
@@ -167,21 +165,29 @@ bool GpuBackendOpenGL::init()
 		"	Color = texture(Texture, texCoord.xy) * TextureScale;\n"
 		"}\n";
 
-	fragHandle = glCreateShader(GL_FRAGMENT_SHADER);
+	GLuint fragHandle = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragHandle, 1, &fragmentShader, nullptr);
 	glCompileShader(fragHandle);
 	if (!checkShader(fragHandle, "fragment shader"))
 		return false;
 
-	shaderHandle = glCreateProgram();
-	glAttachShader(shaderHandle, vertHandle);
-	glAttachShader(shaderHandle, fragHandle);
-	glLinkProgram(shaderHandle);
-	if (!checkProgram(shaderHandle))
+	resolveShaderHandle = glCreateProgram();
+	glAttachShader(resolveShaderHandle, vertHandle);
+	glAttachShader(resolveShaderHandle, fragHandle);
+	glLinkProgram(resolveShaderHandle);
+	if (!checkProgram(resolveShaderHandle))
 		return false;
 
-	attribLocationTex = glGetUniformLocation(shaderHandle, "Texture");
-	attribLocationTexScale = glGetUniformLocation(shaderHandle, "TextureScale");
+	// Clean up once program is linked
+	glDetachShader(resolveShaderHandle, vertHandle);
+	glDetachShader(resolveShaderHandle, fragHandle);
+	glDeleteShader(vertHandle);
+	glDeleteShader(fragHandle);
+	vertHandle = 0;
+	fragHandle = 0;
+
+	resolveAttribLocationTex = glGetUniformLocation(resolveShaderHandle, "Texture");
+	resolveAttribLocationTexScale = glGetUniformLocation(resolveShaderHandle, "TextureScale");
 
 	const byte texInitData[] =
 	{
@@ -203,19 +209,13 @@ bool GpuBackendOpenGL::init()
 
 bool GpuBackendOpenGL::end()
 {
-	glDetachShader(shaderHandle, vertHandle);
-	glDetachShader(shaderHandle, fragHandle);
-	glDeleteProgram(shaderHandle);
-	glDeleteShader(vertHandle);
-	glDeleteShader(fragHandle);
-	shaderHandle = 0;
-	vertHandle = 0;
-	fragHandle = 0;
+	glDeleteProgram(resolveShaderHandle);
+	resolveShaderHandle = 0;
+	resolveAttribLocationTex = 0;
+	resolveAttribLocationTexScale = 0;
 
 	glDeleteTextures(1, &displayTexture);
 	displayTexture = 0;
-	attribLocationTex = 0;
-	attribLocationTexScale = 0;
 
 	return checkGLErrors();
 }
@@ -225,28 +225,32 @@ bool GpuBackendOpenGL::render()
 	glClearColor(0.15, 0.1, 0.15, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glDisable(GL_BLEND);
-	glDisable(GL_CULL_FACE);
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_STENCIL_TEST);
-	glDisable(GL_SCISSOR_TEST);
+	// Full-screen draw
+	{
+		glDisable(GL_BLEND);
+		glDisable(GL_CULL_FACE);
+		glDisable(GL_DEPTH_TEST);
+		glDisable(GL_STENCIL_TEST);
+		glDisable(GL_SCISSOR_TEST);
 
-	glUseProgram(shaderHandle);
+		glUseProgram(resolveShaderHandle);
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, displayTexture);
-	glUniform1i(attribLocationTex, 0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, displayTexture);
+		glUniform1i(resolveAttribLocationTex, 0);
 
-	GLuint vaoHandle;
-	glGenVertexArrays(1, &vaoHandle);
-	glBindVertexArray(vaoHandle);
+		GLuint vaoHandle;
+		glGenVertexArrays(1, &vaoHandle);
+		glBindVertexArray(vaoHandle);
 
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
 
-	// Reset state
-	glDeleteVertexArrays(1, &vaoHandle);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glUseProgram(0);
+		glDeleteVertexArrays(1, &vaoHandle);
+
+		// Reset state
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glUseProgram(0);
+	}
 
 	static int frameNumber = 0;
 	return checkGLErrors(std::string("frame #") + std::to_string(frameNumber++));
@@ -254,14 +258,17 @@ bool GpuBackendOpenGL::render()
 
 void GpuBackendOpenGL::updateDisplayImage(const Framebuffer &image)
 {
-	glUseProgram(shaderHandle);
-	glUniform1f(attribLocationTexScale, 0.005f);
+	uint w = image.getWidth();
+	uint h = image.getHeight();
+	float imageMax = 200.0f;
+	// float imageMax = image.getMax();	TODO
+
+	glUseProgram(resolveShaderHandle);
+	glUniform1f(resolveAttribLocationTexScale, 1.0f / imageMax);
 	glUseProgram(0);
 
 	// TODO: stage image
 	glBindTexture(GL_TEXTURE_2D, displayTexture);
-	uint w = image.getWidth();
-	uint h = image.getHeight();
 	const byte *data = image.getData();
 	// TODO: adapt according to image format
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_FLOAT, data);

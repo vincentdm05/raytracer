@@ -23,3 +23,7 @@ Real schlick(Real cosine, Real refractionIndex)
 	r0 *= r0;
 	return r0 + (1 - r0) * pow(1 - cosine, 5);
 }
+
+// TODO: Cook-Torrance brdf, GGX, Schlick as a bare minimum
+// http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html
+// TODO: importance sampling

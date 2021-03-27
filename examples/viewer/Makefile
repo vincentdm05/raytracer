@@ -12,7 +12,7 @@ HEADERS = $(shell find $(PROJECT_ROOT) -type f -name '*.hpp')
 OBJS = $(addprefix $(BUILD_DIR), $(addsuffix .o, $(basename $(notdir $(SOURCES)))))
 
 CXX = g++
-CXXFLAGS = -I$(PROJECT_ROOT)
+CXXFLAGS = -I$(PROJECT_ROOT)src
 CXXFLAGS += -O3 -g -Wall -Wformat -std=c++11
 LIBS =
 

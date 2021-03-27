@@ -75,7 +75,7 @@ toolDir="$(absolute_path "$(dirname "$0")" )"
 
 # Default root directory to parent of tools folder
 if [[ -z "${rootDir}" ]]; then
-	rootDir="$toolDir"/..
+	rootDir="$toolDir"/../src
 fi
 
 if [[ ! -d "${rootDir}" ]]; then

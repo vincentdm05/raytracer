@@ -44,30 +44,44 @@ struct FramebufferDesc
 	uint width = 1;
 	uint height = 1;
 	FramebufferFormat format = FBFormat_r32f;
+
+	bool operator==(const FramebufferDesc &other) const;
+	bool operator!=(const FramebufferDesc &other) const { return !(*this == other); }
 };
+
+bool FramebufferDesc::operator==(const FramebufferDesc &other) const
+{
+	return width == other.width &&
+		height == other.height &&
+		format == other.format;
+}
 
 class Framebuffer
 {
 private:
-	uint width = 0;
-	uint height = 0;
-	Real aspectRatio = 0.0;
-	uint pixelSizeInBytes = 0;
-	uint dataSize = 0;
-	FramebufferFormat format = FBFormat_Invalid;
+	FramebufferDesc descriptor;
 	byte *data = nullptr;
 
+	// Meta data
+	Real aspectRatio = 0.0;
+	uint channelAmount = 0;
+	uint pixelSizeInBytes = 0;
+	uint dataSize = 0;
+
 	uint positionToIndex(int x, int y) const;
-	uint channelAmount() const;
-	uint getPixelSizeInBytes();
 
 public:
 	Framebuffer(const FramebufferDesc &desc);
 	~Framebuffer() { delete[] data; }
 
-	uint getWidth() const { return width; }
-	uint getHeight() const { return height; }
+	void operator=(const Framebuffer &other);
+
+	FramebufferDesc getDesc() const { return descriptor; }
+	uint getWidth() const { return descriptor.width; }
+	uint getHeight() const { return descriptor.height; }
 	Real getAspectRatio() const { return aspectRatio; }
+	uint getChannelAmount() const { return channelAmount; }
+	uint getPixelSizeInBytes() const { return pixelSizeInBytes; }
 	const byte *getData() const { return data; }
 	void store(int x, int y, const byte *in);
 	void load(int x, int y, byte *out) const;
@@ -76,61 +90,63 @@ public:
 uint Framebuffer::positionToIndex(int x, int y) const
 {
 	// TODO: ordering, e.g. Morton
-	x = clamp(x, 0, width - 1);
-	y = clamp(y, 0, height - 1);
-	return uint(x + y * width) * pixelSizeInBytes;
-}
-
-uint Framebuffer::channelAmount() const
-{
-	uint amount = 0;
-	if (format > FBFormat_Invalid)
-		amount += 1;
-	if (format > FBFormat_r32sn)
-		amount += 2;
-
-	return amount;
-}
-
-uint Framebuffer::getPixelSizeInBytes()
-{
-	if (pixelSizeInBytes)
-		return pixelSizeInBytes;
-
-	if (format == FBFormat_r32f ||
-		format == FBFormat_r32g32b32f)
-	{
-		pixelSizeInBytes = sizeof(float);
-	}
-	else if (format == FBFormat_r32ui ||
-		format == FBFormat_r32g32b32ui ||
-		format == FBFormat_r32un ||
-		format == FBFormat_r32g32b32un)
-	{
-		pixelSizeInBytes = sizeof(uint);
-	}
-	else if (format == FBFormat_r32si ||
-		format == FBFormat_r32g32b32si ||
-		format == FBFormat_r32sn ||
-		format == FBFormat_r32g32b32sn)
-	{
-		pixelSizeInBytes = sizeof(int);
-	}
-
-	pixelSizeInBytes *= channelAmount();
-
-	return pixelSizeInBytes;
+	x = clamp(x, 0, descriptor.width - 1);
+	y = clamp(y, 0, descriptor.height - 1);
+	return uint(x + y * descriptor.width) * pixelSizeInBytes;
 }
 
 Framebuffer::Framebuffer(const FramebufferDesc &desc)
 {
-	width = max(desc.width, 1u);
-	height = max(desc.height, 1u);
-	aspectRatio = Real(width) / Real(height);
-	format = desc.format;
+	descriptor.width = max(desc.width, 1u);
+	descriptor.height = max(desc.height, 1u);
+	descriptor.format = desc.format;
 
-	dataSize = getPixelSizeInBytes() * width * height;
+	aspectRatio = Real(descriptor.width) / Real(descriptor.height);
+
+	// Number of channels
+	channelAmount = 0;
+	if (descriptor.format > FBFormat_Invalid)
+		channelAmount += 1;
+	if (descriptor.format > FBFormat_r32sn)
+		channelAmount += 2;
+
+	// Number of bytes in one pixel
+	if (descriptor.format == FBFormat_r32f ||
+		descriptor.format == FBFormat_r32g32b32f)
+	{
+		pixelSizeInBytes = sizeof(float);
+	}
+	else if (descriptor.format == FBFormat_r32ui ||
+		descriptor.format == FBFormat_r32g32b32ui ||
+		descriptor.format == FBFormat_r32un ||
+		descriptor.format == FBFormat_r32g32b32un)
+	{
+		pixelSizeInBytes = sizeof(uint);
+	}
+	else if (descriptor.format == FBFormat_r32si ||
+		descriptor.format == FBFormat_r32g32b32si ||
+		descriptor.format == FBFormat_r32sn ||
+		descriptor.format == FBFormat_r32g32b32sn)
+	{
+		pixelSizeInBytes = sizeof(int);
+	}
+
+	pixelSizeInBytes *= channelAmount;
+
+	dataSize = pixelSizeInBytes * descriptor.width * descriptor.height;
 	data = new byte[dataSize]();
+}
+
+void Framebuffer::operator=(const Framebuffer &other)
+{
+	if (descriptor != other.descriptor)
+	{
+		delete[] data;
+		std::memcpy(this, &other, sizeof(other));
+		data = new byte[dataSize];
+	}
+
+	std::memcpy(data, other.data, dataSize);
 }
 
 void Framebuffer::store(int x, int y, const byte *in)

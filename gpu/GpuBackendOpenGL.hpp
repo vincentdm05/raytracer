@@ -16,7 +16,6 @@ private:
 	GLuint resolveShaderHandle = 0;
 	GLuint displayTexture = 0;
 	GLint resolveAttribLocationTex = 0;
-	GLint resolveAttribLocationTexScale = 0;
 
 	bool checkGLErrors(const std::string &contextString = "") const;
 	bool checkShader(GLuint handle, const char *shaderName) const;
@@ -158,11 +157,10 @@ bool GpuBackendOpenGL::init()
 		"#version 410\n"
 		"in vec2 texCoord;\n"
 		"uniform sampler2D Texture;\n"
-		"uniform float TextureScale;\n"
 		"layout (location = 0) out vec4 Color;\n"
 		"void main()\n"
 		"{\n"
-		"	Color = texture(Texture, texCoord.xy) * TextureScale;\n"
+		"	Color = texture(Texture, texCoord.xy);\n"
 		"}\n";
 
 	GLuint fragHandle = glCreateShader(GL_FRAGMENT_SHADER);
@@ -187,7 +185,6 @@ bool GpuBackendOpenGL::init()
 	fragHandle = 0;
 
 	resolveAttribLocationTex = glGetUniformLocation(resolveShaderHandle, "Texture");
-	resolveAttribLocationTexScale = glGetUniformLocation(resolveShaderHandle, "TextureScale");
 
 	const byte texInitData[] =
 	{
@@ -212,7 +209,6 @@ bool GpuBackendOpenGL::end()
 	glDeleteProgram(resolveShaderHandle);
 	resolveShaderHandle = 0;
 	resolveAttribLocationTex = 0;
-	resolveAttribLocationTexScale = 0;
 
 	glDeleteTextures(1, &displayTexture);
 	displayTexture = 0;
@@ -260,14 +256,7 @@ void GpuBackendOpenGL::updateDisplayImage(const Framebuffer &image)
 {
 	uint w = image.getWidth();
 	uint h = image.getHeight();
-	float imageMax = 200.0f;
-	// float imageMax = image.getMax();	TODO
 
-	glUseProgram(resolveShaderHandle);
-	glUniform1f(resolveAttribLocationTexScale, 1.0f / imageMax);
-	glUseProgram(0);
-
-	// TODO: stage image
 	glBindTexture(GL_TEXTURE_2D, displayTexture);
 	const byte *data = image.getData();
 	// TODO: adapt according to image format

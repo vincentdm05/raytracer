@@ -10,6 +10,84 @@
 #include <iostream>
 #include <string>
 
+struct OpengGLTextureDesc
+{
+	GLenum target;
+	GLint level;
+	GLint internalformat;
+	GLsizei width;
+	GLsizei height;
+	GLint border;
+	GLenum format;
+	GLenum type;
+
+	OpengGLTextureDesc(const Framebuffer &image);
+};
+
+OpengGLTextureDesc::OpengGLTextureDesc(const Framebuffer &image)
+{
+	FramebufferDesc framebufferDesc = image.getDesc();
+
+	// Only support a limited subset of textures for the moment
+	target = GL_TEXTURE_2D;
+	level = 0;
+	width = framebufferDesc.width;
+	height = framebufferDesc.height;
+	border = 0;
+
+	switch (framebufferDesc.format)
+	{
+		case FBFormat_r32f:
+		{
+			internalformat = GL_R32F;
+			format = GL_RED;
+			type = GL_FLOAT;
+			break;
+		}
+		case FBFormat_r32ui:
+		{
+			internalformat = GL_R32UI;
+			format = GL_RED;
+			type = GL_UNSIGNED_INT;
+			break;
+		}
+		case FBFormat_r32si:
+		{
+			internalformat = GL_R32I;
+			format = GL_RED;
+			type = GL_FLOAT;
+			break;
+		}
+		case FBFormat_r32g32b32f:
+		{
+			internalformat = GL_RGB32F;
+			format = GL_RGB;
+			type = GL_FLOAT;
+			break;
+		}
+		case FBFormat_r32g32b32ui:
+		{
+			internalformat = GL_RGB32UI;
+			format = GL_RGB;
+			type = GL_UNSIGNED_INT;
+			break;
+		}
+		case FBFormat_r32g32b32si:
+		{
+			internalformat = GL_RGB32I;
+			format = GL_RGB;
+			type = GL_INT;
+			break;
+		}
+		default:
+		{
+			internalformat = GL_R32F;
+			format = GL_RED;
+			type = GL_FLOAT;
+		}
+	};
+}
+
 class GpuBackendOpenGL : public GpuBackend
 {
 private:
@@ -254,13 +332,12 @@ bool GpuBackendOpenGL::render()
 
 void GpuBackendOpenGL::updateDisplayImage(const Framebuffer &image)
 {
-	uint w = image.getWidth();
-	uint h = image.getHeight();
-
 	glBindTexture(GL_TEXTURE_2D, displayTexture);
 	const byte *data = image.getData();
-	// TODO: adapt according to image format
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_FLOAT, data);
+
+	OpengGLTextureDesc desc(image);
+	glTexImage2D(desc.target, desc.level, desc.internalformat, desc.width, desc.height, desc.border, desc.format, desc.type, data);
+
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 

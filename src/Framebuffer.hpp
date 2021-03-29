@@ -27,15 +27,11 @@ enum FramebufferFormat
 	FBFormat_r32f,
 	FBFormat_r32ui,
 	FBFormat_r32si,
-	FBFormat_r32un,
-	FBFormat_r32sn,
 
 	// 3 channels
 	FBFormat_r32g32b32f,
 	FBFormat_r32g32b32ui,
 	FBFormat_r32g32b32si,
-	FBFormat_r32g32b32un,
-	FBFormat_r32g32b32sn,
 };
 
 // Descriptor for the framebuffer construction
@@ -105,10 +101,10 @@ Framebuffer::Framebuffer(const FramebufferDesc &desc)
 
 	// Number of channels
 	channelAmount = 0;
-	if (descriptor.format > FBFormat_Invalid)
-		channelAmount += 1;
-	if (descriptor.format > FBFormat_r32sn)
-		channelAmount += 2;
+	if (descriptor.format >= FBFormat_r32g32b32f)
+		channelAmount = 3;
+	else if (descriptor.format >= FBFormat_r32f)
+		channelAmount = 1;
 
 	// Number of bytes in one pixel
 	if (descriptor.format == FBFormat_r32f ||
@@ -117,16 +113,12 @@ Framebuffer::Framebuffer(const FramebufferDesc &desc)
 		pixelSizeInBytes = sizeof(float);
 	}
 	else if (descriptor.format == FBFormat_r32ui ||
-		descriptor.format == FBFormat_r32g32b32ui ||
-		descriptor.format == FBFormat_r32un ||
-		descriptor.format == FBFormat_r32g32b32un)
+		descriptor.format == FBFormat_r32g32b32ui)
 	{
 		pixelSizeInBytes = sizeof(uint);
 	}
 	else if (descriptor.format == FBFormat_r32si ||
-		descriptor.format == FBFormat_r32g32b32si ||
-		descriptor.format == FBFormat_r32sn ||
-		descriptor.format == FBFormat_r32g32b32sn)
+		descriptor.format == FBFormat_r32g32b32si)
 	{
 		pixelSizeInBytes = sizeof(int);
 	}

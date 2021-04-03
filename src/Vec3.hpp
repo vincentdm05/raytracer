@@ -8,8 +8,6 @@
 #include <cmath>
 #include <iostream>
 
-// TODO: vec swizzle like https://stackoverflow.com/questions/51641131/how-to-achieve-vector-swizzling-in-c/51822107#51822107
-
 class Vec3
 {
 public:

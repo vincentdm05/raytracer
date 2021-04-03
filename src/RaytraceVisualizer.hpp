@@ -3,7 +3,7 @@
 #include "Common.hpp"
 
 #include "Camera.hpp"
-#include "Framebuffer.hpp"
+#include "Image.hpp"
 #include "Material.hpp"
 #include "Math.hpp"
 #include "Random.hpp"
@@ -28,7 +28,7 @@ private:
 	Vec3 getBounceColour(const Ray &r, uint bounces) const;
 
 public:
-	RaytraceVisualizer(RaytraceVisualizerType type, const Scene &s, const Camera &cam, const Viewport &vp, Framebuffer &fb);
+	RaytraceVisualizer(RaytraceVisualizerType type, const Scene &s, const Camera &cam, const Viewport &vp, Image &image);
 
 	virtual void renderPixel(uint col, uint row) const override;
 };
@@ -46,8 +46,8 @@ Vec3 RaytraceVisualizer::getBounceColour(const Ray &r, uint bounces) const
 	return Vec3(1, 1, 1) * (Real(bounces) / Real(maxBounces));
 }
 
-RaytraceVisualizer::RaytraceVisualizer(RaytraceVisualizerType type, const Scene &s, const Camera &cam, const Viewport &vp, Framebuffer &fb)
-: Raytrace(s, cam, vp, fb)
+RaytraceVisualizer::RaytraceVisualizer(RaytraceVisualizerType type, const Scene &s, const Camera &cam, const Viewport &vp, Image &image)
+: Raytrace(s, cam, vp, image)
 , visualizerType(type)
 {}
 
@@ -92,5 +92,5 @@ void RaytraceVisualizer::renderPixel(uint col, uint row) const
 	colourArray[0] = colour.r;
 	colourArray[1] = colour.g;
 	colourArray[2] = colour.b;
-	framebuffer.store(int(col), int(row), (byte*)colourArray);
+	image.store(int(col), int(row), (byte*)colourArray);
 }

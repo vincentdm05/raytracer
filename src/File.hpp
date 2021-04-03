@@ -2,7 +2,7 @@
 
 #include "Common.hpp"
 
-#include "Framebuffer.hpp"
+#include "Image.hpp"
 #include "Vec3.hpp"
 
 #include <fstream>
@@ -12,8 +12,8 @@
 namespace file
 {
 
-// By default (range <= 0) the maximum value is searched in the framebuffer during traversal.
-bool writePpm(const std::string& baseFileName, const Framebuffer &framebuffer, int range = -1)
+// By default (range <= 0) the maximum value is searched in the image during traversal.
+bool writePpm(const std::string& baseFileName, const Image &image, int range = -1)
 {
 	std::string fileName(baseFileName);
 	std::string extension(".ppm");
@@ -30,8 +30,8 @@ bool writePpm(const std::string& baseFileName, const Framebuffer &framebuffer, i
 		return false;
 	}
 
-	uint width = framebuffer.getWidth();
-	uint height = framebuffer.getHeight();
+	uint width = image.getWidth();
+	uint height = image.getHeight();
 
 	// PPM header
 	file << "P3\n" << width << " " << height << "\n";
@@ -45,7 +45,7 @@ bool writePpm(const std::string& baseFileName, const Framebuffer &framebuffer, i
 	{
 		for (int col = 0; col < int(width); col++)
 		{
-			framebuffer.load(col, row, (byte*)colourArray);
+			image.load(col, row, (byte*)colourArray);
 			Vec3 colour(colourArray[0], colourArray[1], colourArray[2]);
 			if (range <= 0)
 				maxValue = max(int(max(colour)), maxValue);

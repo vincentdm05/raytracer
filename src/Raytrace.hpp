@@ -4,7 +4,7 @@
 
 #include "Background.hpp"
 #include "Camera.hpp"
-#include "Framebuffer.hpp"
+#include "Image.hpp"
 #include "Material.hpp"
 #include "Math.hpp"
 #include "PixelRenderer.hpp"
@@ -19,7 +19,7 @@ class Raytrace : public PixelRenderer
 protected:
 	const Camera &camera;
 	const Scene &scene;
-	Framebuffer &framebuffer;
+	Image &image;
 	uint maxBounces = 50;
 	uint samplesPerPixel = 100;
 
@@ -27,7 +27,7 @@ protected:
 	Vec3 getColour(const Ray &r, const Scene &scene, uint bounces = 0) const;
 
 public:
-	Raytrace(const Scene &s, const Camera &cam, const Viewport &vp, Framebuffer &fb);
+	Raytrace(const Scene &s, const Camera &cam, const Viewport &vp, Image &img);
 
 	virtual void renderPixel(uint col, uint row) const override;
 
@@ -62,11 +62,11 @@ Vec3 Raytrace::getColour(const Ray &r, const Scene &scene, uint bounces) const
 	return scene.background().sample(r.direction());
 }
 
-Raytrace::Raytrace(const Scene &s, const Camera &cam, const Viewport &vp, Framebuffer &fb)
+Raytrace::Raytrace(const Scene &s, const Camera &cam, const Viewport &vp, Image &img)
 : PixelRenderer(vp)
 , camera(cam)
 , scene(s)
-, framebuffer(fb)
+, image(img)
 {}
 
 void Raytrace::renderPixel(uint col, uint row) const
@@ -103,5 +103,5 @@ void Raytrace::renderPixel(uint col, uint row) const
 	colourArray[0] = colour.r;
 	colourArray[1] = colour.g;
 	colourArray[2] = colour.b;
-	framebuffer.store(int(col), int(row), (byte*)colourArray);
+	image.store(int(col), int(row), (byte*)colourArray);
 }

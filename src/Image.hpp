@@ -6,10 +6,10 @@
 
 #include <cstring>	// For memcpy
 
-enum class FramebufferFormat
+enum class ImageFormat
 {
 	// How to read:
-	// FramebufferFormat::AX[BY[CZ[DW]]]F
+	// ImageFormat::AX[BY[CZ[DW]]]F
 	// Where A, B, C and D are channel names (e.g. r, g, b or a)
 	// X, Y, Z and W are channel lengths (e.g. 8, 16 or 32)
 	// F is the underlying format. See below:
@@ -35,28 +35,28 @@ enum class FramebufferFormat
 	Count
 };
 
-// Descriptor for the framebuffer construction
-struct FramebufferDesc
+// Descriptor for the image construction
+struct ImageDesc
 {
 	uint width = 1;
 	uint height = 1;
-	FramebufferFormat format = FramebufferFormat::r32f;
+	ImageFormat format = ImageFormat::r32f;
 
-	bool operator==(const FramebufferDesc &other) const;
-	bool operator!=(const FramebufferDesc &other) const { return !(*this == other); }
+	bool operator==(const ImageDesc &other) const;
+	bool operator!=(const ImageDesc &other) const { return !(*this == other); }
 };
 
-bool FramebufferDesc::operator==(const FramebufferDesc &other) const
+bool ImageDesc::operator==(const ImageDesc &other) const
 {
 	return width == other.width &&
 		height == other.height &&
 		format == other.format;
 }
 
-class Framebuffer
+class Image
 {
 private:
-	FramebufferDesc descriptor;
+	ImageDesc descriptor;
 	byte *data = nullptr;
 
 	// Meta data
@@ -68,12 +68,12 @@ private:
 	uint positionToIndex(int x, int y) const;
 
 public:
-	Framebuffer(const FramebufferDesc &desc);
-	~Framebuffer() { delete[] data; }
+	Image(const ImageDesc &desc);
+	~Image() { delete[] data; }
 
-	void operator=(const Framebuffer &other);
+	void operator=(const Image &other);
 
-	FramebufferDesc getDesc() const { return descriptor; }
+	ImageDesc getDesc() const { return descriptor; }
 	uint getWidth() const { return descriptor.width; }
 	uint getHeight() const { return descriptor.height; }
 	Real getAspectRatio() const { return aspectRatio; }
@@ -84,15 +84,14 @@ public:
 	void load(int x, int y, byte *out) const;
 };
 
-uint Framebuffer::positionToIndex(int x, int y) const
+uint Image::positionToIndex(int x, int y) const
 {
-	// TODO: ordering, e.g. Morton
 	x = clamp(x, 0, descriptor.width - 1);
 	y = clamp(y, 0, descriptor.height - 1);
 	return uint(x + y * descriptor.width) * pixelSizeInBytes;
 }
 
-Framebuffer::Framebuffer(const FramebufferDesc &desc)
+Image::Image(const ImageDesc &desc)
 {
 	descriptor.width = max(desc.width, 1u);
 	descriptor.height = max(desc.height, 1u);
@@ -103,16 +102,16 @@ Framebuffer::Framebuffer(const FramebufferDesc &desc)
 	// Number of channels
 	switch (descriptor.format)
 	{
-		case FramebufferFormat::r32f:
-		case FramebufferFormat::r32ui:
-		case FramebufferFormat::r32si:
+		case ImageFormat::r32f:
+		case ImageFormat::r32ui:
+		case ImageFormat::r32si:
 		{
 			channelAmount = 1;
 			break;
 		}
-		case FramebufferFormat::r32g32b32f:
-		case FramebufferFormat::r32g32b32ui:
-		case FramebufferFormat::r32g32b32si:
+		case ImageFormat::r32g32b32f:
+		case ImageFormat::r32g32b32ui:
+		case ImageFormat::r32g32b32si:
 		{
 			channelAmount = 3;
 			break;
@@ -124,20 +123,20 @@ Framebuffer::Framebuffer(const FramebufferDesc &desc)
 	// Number of bytes in one pixel
 	switch (descriptor.format)
 	{
-		case FramebufferFormat::r32f:
-		case FramebufferFormat::r32g32b32f:
+		case ImageFormat::r32f:
+		case ImageFormat::r32g32b32f:
 		{
 			pixelSizeInBytes = sizeof(float);
 			break;
 		}
-		case FramebufferFormat::r32ui:
-		case FramebufferFormat::r32g32b32ui:
+		case ImageFormat::r32ui:
+		case ImageFormat::r32g32b32ui:
 		{
 			pixelSizeInBytes = sizeof(uint);
 			break;
 		}
-		case FramebufferFormat::r32si:
-		case FramebufferFormat::r32g32b32si:
+		case ImageFormat::r32si:
+		case ImageFormat::r32g32b32si:
 		{
 			pixelSizeInBytes = sizeof(int);
 			break;
@@ -151,7 +150,7 @@ Framebuffer::Framebuffer(const FramebufferDesc &desc)
 	data = new byte[dataSize]();
 }
 
-void Framebuffer::operator=(const Framebuffer &other)
+void Image::operator=(const Image &other)
 {
 	if (descriptor != other.descriptor)
 	{
@@ -163,13 +162,13 @@ void Framebuffer::operator=(const Framebuffer &other)
 	std::memcpy(data, other.data, dataSize);
 }
 
-void Framebuffer::store(int x, int y, const byte *in)
+void Image::store(int x, int y, const byte *in)
 {
 	uint index = positionToIndex(x, y);
 	std::memcpy(&data[index], in, pixelSizeInBytes);
 }
 
-void Framebuffer::load(int x, int y, byte *out) const
+void Image::load(int x, int y, byte *out) const
 {
 	uint index = positionToIndex(x, y);
 	std::memcpy(out, &data[index], pixelSizeInBytes);

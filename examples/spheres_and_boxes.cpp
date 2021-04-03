@@ -5,7 +5,7 @@
 #include "Camera.hpp"
 #include "Dielectric.hpp"
 #include "File.hpp"
-#include "Framebuffer.hpp"
+#include "Image.hpp"
 #include "Lambertian.hpp"
 #include "Metal.hpp"
 #include "Raytrace.hpp"
@@ -18,11 +18,11 @@
 int main(int argc, char *argv[])
 {
 	Viewport viewport(512, 256);
-	FramebufferDesc fbDesc;
-	fbDesc.width = viewport.width();
-	fbDesc.height = viewport.height();
-	fbDesc.format = FramebufferFormat::r32g32b32f;
-	Framebuffer framebuffer(fbDesc);
+	ImageDesc imageDesc;
+	imageDesc.width = viewport.width();
+	imageDesc.height = viewport.height();
+	imageDesc.format = ImageFormat::r32g32b32f;
+	Image image(imageDesc);
 
 	Vec3 cameraPosition(0.0, 0.0, 5.0);
 	Vec3 focusPosition(0, 0, 0);
@@ -59,11 +59,11 @@ int main(int argc, char *argv[])
 	scene.add(hitable5);
 	scene.add(hitable6);
 
-	Raytrace raytrace(scene, camera, viewport, framebuffer);
+	Raytrace raytrace(scene, camera, viewport, image);
 	Renderer renderer;
 	renderer.render(raytrace);
 
-	file::writePpm(argv[argc > 1 ? 1 : 0], framebuffer, 255);
+	file::writePpm(argv[argc > 1 ? 1 : 0], image, 255);
 
 	return 0;
 }

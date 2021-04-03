@@ -6,7 +6,7 @@
 #include "Dielectric.hpp"
 #include "DiffuseLight.hpp"
 #include "File.hpp"
-#include "Framebuffer.hpp"
+#include "Image.hpp"
 #include "Metal.hpp"
 #include "Lambertian.hpp"
 #include "Raytrace.hpp"
@@ -18,7 +18,7 @@
 #include "Vec3.hpp"
 
 // 3 spherical lights with glass around some
-void renderScene1(Framebuffer &framebuffer, const Viewport &viewport, uint samplesPerPixel)
+void renderScene1(Image &image, const Viewport &viewport, uint samplesPerPixel)
 {
 	Vec3 cameraPosition(0.0, 0.0, 8.0);
 	Vec3 focusPosition(0, 0, 0);
@@ -48,14 +48,14 @@ void renderScene1(Framebuffer &framebuffer, const Viewport &viewport, uint sampl
 	Sphere lightSphere3(focusPosition + Vec3(1.0, 0.0, 0.0), 0.17, lightMaterial);
 	scene.add(lightSphere3);
 
-	Raytrace raytrace(scene, camera, viewport, framebuffer);
+	Raytrace raytrace(scene, camera, viewport, image);
 	raytrace.setSamplesPerPixel(samplesPerPixel);
 	Renderer renderer;
 	renderer.render(raytrace);
 }
 
 // Hollow glass sphere and top light creating caustic on the floor
-void renderScene2(Framebuffer &framebuffer, const Viewport &viewport, uint samplesPerPixel)
+void renderScene2(Image &image, const Viewport &viewport, uint samplesPerPixel)
 {
 	Vec3 cameraPosition(0.0, 0.0, 5.0);
 	Vec3 focusPosition(0, 0, 0);
@@ -79,14 +79,14 @@ void renderScene2(Framebuffer &framebuffer, const Viewport &viewport, uint sampl
 	Sphere lightSphere1(focusPosition + Vec3(0.0, 1.5, 0.0), 0.2, lightMaterial);
 	scene.add(lightSphere1);
 
-	Raytrace raytrace(scene, camera, viewport, framebuffer);
+	Raytrace raytrace(scene, camera, viewport, image);
 	raytrace.setSamplesPerPixel(samplesPerPixel);
 	Renderer renderer;
 	renderer.render(raytrace);
 }
 
 // Metal sphere inside glass, with light shining from behind
-void renderScene3(Framebuffer &framebuffer, const Viewport &viewport, uint samplesPerPixel)
+void renderScene3(Image &image, const Viewport &viewport, uint samplesPerPixel)
 {
 	Vec3 cameraPosition(0.0, 0.0, 5.0);
 	Vec3 focusPosition(0, 0, 0);
@@ -111,14 +111,14 @@ void renderScene3(Framebuffer &framebuffer, const Viewport &viewport, uint sampl
 	Sphere lightSphere1(focusPosition + Vec3(0.0, 0.0, -1.5), 0.2, lightMaterial);
 	scene.add(lightSphere1);
 
-	Raytrace raytrace(scene, camera, viewport, framebuffer);
+	Raytrace raytrace(scene, camera, viewport, image);
 	raytrace.setSamplesPerPixel(samplesPerPixel);
 	Renderer renderer;
 	renderer.render(raytrace);
 }
 
 // Glass with two bubbles
-void renderScene4(Framebuffer &framebuffer, const Viewport &viewport, uint samplesPerPixel)
+void renderScene4(Image &image, const Viewport &viewport, uint samplesPerPixel)
 {
 	Vec3 cameraPosition(0.0, 0.0, 5.0);
 	Vec3 focusPosition(0, 0, 0);
@@ -144,14 +144,14 @@ void renderScene4(Framebuffer &framebuffer, const Viewport &viewport, uint sampl
 	Sphere lightSphere1(focusPosition + Vec3(1.0, 1.5, -1.0), 0.2, lightMaterial);
 	scene.add(lightSphere1);
 
-	Raytrace raytrace(scene, camera, viewport, framebuffer);
+	Raytrace raytrace(scene, camera, viewport, image);
 	raytrace.setSamplesPerPixel(samplesPerPixel);
 	Renderer renderer;
 	renderer.render(raytrace);
 }
 
 // 4 metal spheres in a pyramid, surrounded by a few lights
-void renderScene5(Framebuffer &framebuffer, const Viewport &viewport, uint samplesPerPixel)
+void renderScene5(Image &image, const Viewport &viewport, uint samplesPerPixel)
 {
 	Vec3 cameraPosition(0.0, 0.0, 5.0);
 	Vec3 focusPosition(0, 0, 0);
@@ -185,14 +185,14 @@ void renderScene5(Framebuffer &framebuffer, const Viewport &viewport, uint sampl
 	Sphere lightSphere4(focusPosition + Vec3(0.0, 0.0, 5.5), 0.2, lightMaterial);
 	scene.add(lightSphere4);
 
-	Raytrace raytrace(scene, camera, viewport, framebuffer);
+	Raytrace raytrace(scene, camera, viewport, image);
 	raytrace.setSamplesPerPixel(samplesPerPixel);
 	Renderer renderer;
 	renderer.render(raytrace);
 }
 
 // Metallic pyramid with embedded light
-void renderScene6(Framebuffer &framebuffer, const Viewport &viewport, uint samplesPerPixel)
+void renderScene6(Image &image, const Viewport &viewport, uint samplesPerPixel)
 {
 	Vec3 cameraPosition(1.0, 4.0, 8.0);
 	Vec3 focusPosition(0, 0, 0);
@@ -222,13 +222,13 @@ void renderScene6(Framebuffer &framebuffer, const Viewport &viewport, uint sampl
 	Sphere lightSphere2(focusPosition + Vec3(-2.0, 3.0, 0.0), 0.5, lightMaterial);
 	scene.add(lightSphere2);
 
-	Raytrace raytrace(scene, camera, viewport, framebuffer);
+	Raytrace raytrace(scene, camera, viewport, image);
 	raytrace.setSamplesPerPixel(samplesPerPixel);
 	Renderer renderer;
 	renderer.render(raytrace);
 }
 
-void renderScene7(Framebuffer &framebuffer, const Viewport &viewport, uint samplesPerPixel)
+void renderScene7(Image &image, const Viewport &viewport, uint samplesPerPixel)
 {
 	Vec3 cameraPosition(0.0, 0.0, 8.0);
 	Vec3 focusPosition(0, 0, 0);
@@ -257,7 +257,7 @@ void renderScene7(Framebuffer &framebuffer, const Viewport &viewport, uint sampl
 	Rect lightRect3(Transform(Quat(), focusPosition + Vec3(0.0, 0.0, -1.0), 1.0), 1.5, 1.5, lightMaterial3);
 	scene.add(lightRect3);
 
-	Raytrace raytrace(scene, camera, viewport, framebuffer);
+	Raytrace raytrace(scene, camera, viewport, image);
 	raytrace.setSamplesPerPixel(samplesPerPixel);
 	Renderer renderer;
 	renderer.render(raytrace);
@@ -269,21 +269,21 @@ int main(int argc, char *argv[])
 	uint height = 300;
 	const Real aspectRatio = 16.0 / 10.0;
 	Viewport viewport(height * aspectRatio, height);
-	FramebufferDesc fbDesc;
-	fbDesc.width = viewport.width();
-	fbDesc.height = viewport.height();
-	fbDesc.format = FramebufferFormat::r32g32b32f;
-	Framebuffer framebuffer(fbDesc);
+	ImageDesc imageDesc;
+	imageDesc.width = viewport.width();
+	imageDesc.height = viewport.height();
+	imageDesc.format = ImageFormat::r32g32b32f;
+	Image image(imageDesc);
 
-	// renderScene1(framebuffer, viewport, samplesPerPixel);
-	// renderScene2(framebuffer, viewport, samplesPerPixel);
-	// renderScene3(framebuffer, viewport, samplesPerPixel);
-	// renderScene4(framebuffer, viewport, samplesPerPixel);
-	// renderScene5(framebuffer, viewport, samplesPerPixel);
-	// renderScene6(framebuffer, viewport, samplesPerPixel);
-	renderScene7(framebuffer, viewport, samplesPerPixel);
+	// renderScene1(image, viewport, samplesPerPixel);
+	// renderScene2(image, viewport, samplesPerPixel);
+	// renderScene3(image, viewport, samplesPerPixel);
+	// renderScene4(image, viewport, samplesPerPixel);
+	// renderScene5(image, viewport, samplesPerPixel);
+	// renderScene6(image, viewport, samplesPerPixel);
+	renderScene7(image, viewport, samplesPerPixel);
 
-	file::writePpm(argv[argc > 1 ? 1 : 0], framebuffer);
+	file::writePpm(argv[argc > 1 ? 1 : 0], image);
 
 	return 0;
 }

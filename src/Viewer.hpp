@@ -16,12 +16,12 @@ private:
 
 	void clampToAspectRatio(uint &width, uint &height, const Real aspectRatio) const;
 	void getCenteredViewportOrigin(uint &x, uint &y, uint windowWidth, uint windowHeight, uint viewportWidth, uint viewportHeight) const;
-	void normalizeImage(Framebuffer &image) const;
+	void normalizeImage(Image &image) const;
 
 public:
 	Viewer(uint displayWidth, uint displayHeight, const std::string &displayName);
 
-	bool show(const Framebuffer &image);
+	bool show(const Image &image);
 };
 
 void Viewer::clampToAspectRatio(uint &width, uint &height, const Real aspectRatio) const
@@ -44,7 +44,7 @@ void Viewer::getCenteredViewportOrigin(uint &x, uint &y, uint windowWidth, uint 
 	y = (windowHeight - viewportHeight) / 2;
 }
 
-void Viewer::normalizeImage(Framebuffer &image) const
+void Viewer::normalizeImage(Image &image) const
 {
 	uint width = image.getWidth();
 	uint height = image.getHeight();
@@ -84,7 +84,7 @@ Viewer::Viewer(uint displayWidth, uint displayHeight, const std::string &display
 : platform(displayWidth, displayHeight, displayName)
 {}
 
-bool Viewer::show(const Framebuffer &image)
+bool Viewer::show(const Image &image)
 {
 	if (!platform.init())
 		return false;
@@ -92,7 +92,7 @@ bool Viewer::show(const Framebuffer &image)
 	if (!gpu.init())
 		return false;
 
-	Framebuffer stagingImage(image.getDesc());
+	Image stagingImage(image.getDesc());
 
 	while (platform.isLive())
 	{

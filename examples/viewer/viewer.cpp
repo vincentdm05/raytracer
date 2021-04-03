@@ -6,7 +6,7 @@
 #include "Dielectric.hpp"
 #include "DiffuseLight.hpp"
 #include "File.hpp"
-#include "Framebuffer.hpp"
+#include "Image.hpp"
 #include "Metal.hpp"
 #include "Lambertian.hpp"
 #include "Raytrace.hpp"
@@ -25,13 +25,13 @@ class FileWriterCallback : public FinishCallbackFunctor
 {
 private:
 	const char *filename = nullptr;
-	const Framebuffer &framebuffer;
+	const Image &image;
 	std::chrono::high_resolution_clock::time_point timeStart;
 
 public:
-	FileWriterCallback(const char *_filename, const Framebuffer &_framebuffer)
+	FileWriterCallback(const char *_filename, const Image &_image)
 	: filename(_filename)
-	, framebuffer(_framebuffer)
+	, image(_image)
 	{
 		timeStart = std::chrono::high_resolution_clock::now();
 	}
@@ -42,7 +42,7 @@ public:
 		std::cout << "Render duration: " <<
 		std::chrono::duration_cast<std::chrono::milliseconds>(timeStop - timeStart).count() / 1000.0 << "s" <<
 		std::endl;
-		file::writePpm(filename, framebuffer);
+		file::writePpm(filename, image);
 	}
 };
 
@@ -52,11 +52,11 @@ int main(int argc, char *argv[])
 	uint height = 300;
 	const Real aspectRatio = 16.0 / 10.0;
 	Viewport viewport(height * aspectRatio, height);
-	FramebufferDesc fbDesc;
-	fbDesc.width = viewport.width();
-	fbDesc.height = viewport.height();
-	fbDesc.format = FramebufferFormat::r32g32b32f;
-	Framebuffer framebuffer(fbDesc);
+	ImageDesc imageDesc;
+	imageDesc.width = viewport.width();
+	imageDesc.height = viewport.height();
+	imageDesc.format = ImageFormat::r32g32b32f;
+	Image image(imageDesc);
 
 	Vec3 cameraPosition(0.0, 0.0, 8.0);
 	Vec3 focusPosition(0, 0, 0);
@@ -85,15 +85,15 @@ int main(int argc, char *argv[])
 	Rect lightRect3(Transform(Quat(), focusPosition + Vec3(0.0, 0.0, -1.0), 1.0), 1.5, 1.5, lightMaterial3);
 	scene.add(lightRect3);
 
-	Raytrace raytrace(scene, camera, viewport, framebuffer);
+	Raytrace raytrace(scene, camera, viewport, image);
 	raytrace.setSamplesPerPixel(samplesPerPixel);
-	FileWriterCallback finishCallback(argv[argc > 1 ? 1 : 0], framebuffer);
+	FileWriterCallback finishCallback(argv[argc > 1 ? 1 : 0], image);
 	Renderer renderer;
 	renderer.renderAsync(raytrace, RenderFunctionTiles);
 	renderer.setFinishCallback(finishCallback);
 
-	Viewer viewer(fbDesc.width, fbDesc.height, "viewer");
-	if (!viewer.show(framebuffer))
+	Viewer viewer(imageDesc.width, imageDesc.height, "viewer");
+	if (!viewer.show(image))
 		return 1;
 
 	renderer.waitForFinish();

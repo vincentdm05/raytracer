@@ -3,7 +3,7 @@
 #include "Background.hpp"
 #include "Camera.hpp"
 #include "File.hpp"
-#include "Framebuffer.hpp"
+#include "Image.hpp"
 #include "Lambertian.hpp"
 #include "Raytrace.hpp"
 #include "Renderer.hpp"
@@ -14,11 +14,11 @@
 int main(int argc, char *argv[])
 {
 	Viewport viewport(200, 100);
-	FramebufferDesc fbDesc;
-	fbDesc.width = viewport.width();
-	fbDesc.height = viewport.height();
-	fbDesc.format = FramebufferFormat::r32g32b32f;
-	Framebuffer framebuffer(fbDesc);
+	ImageDesc imageDesc;
+	imageDesc.width = viewport.width();
+	imageDesc.height = viewport.height();
+	imageDesc.format = ImageFormat::r32g32b32f;
+	Image image(imageDesc);
 	Camera camera(Vec3(0, 0, 1), Vec3(0, 0, -1), Vec3(0, 1, 0), 45, viewport, 0.5, 2.0);
 
 	Lambertian material0(Vec3(0, 0, 1));
@@ -33,11 +33,11 @@ int main(int argc, char *argv[])
 	scene.add(sphere0);
 	scene.add(sphere1);
 
-	Raytrace raytrace(scene, camera, viewport, framebuffer);
+	Raytrace raytrace(scene, camera, viewport, image);
 	Renderer renderer;
 	renderer.render(raytrace);
 
-	file::writePpm(argv[argc > 1 ? 1 : 0], framebuffer, 255);
+	file::writePpm(argv[argc > 1 ? 1 : 0], image, 255);
 
 	return 0;
 }

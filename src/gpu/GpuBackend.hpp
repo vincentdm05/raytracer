@@ -2,7 +2,7 @@
 
 #include "Common.hpp"
 
-class Framebuffer;
+class Image;
 
 class GpuBackend
 {
@@ -13,6 +13,6 @@ public:
 	virtual bool end() = 0;
 	virtual bool render() = 0;
 
-	virtual void updateDisplayImage(const Framebuffer &image) = 0;
+	virtual void updateDisplayImage(const Image &image) = 0;
 	virtual void setViewport(int x, int y, uint width, uint height) = 0;
 };

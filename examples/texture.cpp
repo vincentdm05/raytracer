@@ -6,7 +6,7 @@
 #include "CheckerTexture.hpp"
 #include "DiffuseLight.hpp"
 #include "File.hpp"
-#include "Framebuffer.hpp"
+#include "Image.hpp"
 #include "Metal.hpp"
 #include "Lambertian.hpp"
 #include "Raytrace.hpp"
@@ -18,7 +18,7 @@
 #include "Vec3.hpp"
 
 // Textured checker floor with two facing mirrors and overhead rectangle light
-void renderScene1(Framebuffer &framebuffer, const Viewport &viewport, uint samplesPerPixel)
+void renderScene1(Image &image, const Viewport &viewport, uint samplesPerPixel)
 {
 	Vec3 cameraPosition(0.0, 0.0, 1.0);
 	Vec3 focusPosition(0, 0, 0);
@@ -43,14 +43,14 @@ void renderScene1(Framebuffer &framebuffer, const Viewport &viewport, uint sampl
 	Rect lightRect1(Transform(axisAngleToQuat(Vec3(1.0, 0.0, 0.0), pi() * 0.5), focusPosition + Vec3(0.0, 0.5, 0.0), 1.0), 3.0, 3.0, lightMaterial);
 	scene.add(lightRect1);
 
-	Raytrace raytrace(scene, camera, viewport, framebuffer);
+	Raytrace raytrace(scene, camera, viewport, image);
 	raytrace.setSamplesPerPixel(samplesPerPixel);
 	Renderer renderer;
 	renderer.render(raytrace);
 }
 
 // Wide cornell box with checker walls
-void renderScene2(Framebuffer &framebuffer, const Viewport &viewport, Real aspectRatio, uint samplesPerPixel)
+void renderScene2(Image &image, const Viewport &viewport, Real aspectRatio, uint samplesPerPixel)
 {
 	Vec3 cameraPosition(278.0, 278.0, -800.0);
 	Vec3 focusPosition(278.0, 278.0, 0.0);
@@ -85,7 +85,7 @@ void renderScene2(Framebuffer &framebuffer, const Viewport &viewport, Real aspec
 	Box bigBox(Transform(axisAngleToQuat(Vec3(0.0, 1.0, 0.0), pi() / 180.0 * 15.0), Vec3(368.5, 165.0, 351.5), 1.0), Vec3(165.0, 330.0, 165.0), white);
 	scene.add(bigBox);
 
-	Raytrace raytrace(scene, camera, viewport, framebuffer);
+	Raytrace raytrace(scene, camera, viewport, image);
 	raytrace.setSamplesPerPixel(samplesPerPixel);
 	Renderer renderer;
 	renderer.render(raytrace);
@@ -97,16 +97,16 @@ int main(int argc, char *argv[])
 	uint height = 300;
 	const Real aspectRatio = 16.0 / 10.0;
 	Viewport viewport(height * aspectRatio, height);
-	FramebufferDesc fbDesc;
-	fbDesc.width = viewport.width();
-	fbDesc.height = viewport.height();
-	fbDesc.format = FramebufferFormat::r32g32b32f;
-	Framebuffer framebuffer(fbDesc);
+	ImageDesc imageDesc;
+	imageDesc.width = viewport.width();
+	imageDesc.height = viewport.height();
+	imageDesc.format = ImageFormat::r32g32b32f;
+	Image image(imageDesc);
 
-	// renderScene1(framebuffer, viewport, samplesPerPixel);
-	renderScene2(framebuffer, viewport, aspectRatio, samplesPerPixel);
+	// renderScene1(image, viewport, samplesPerPixel);
+	renderScene2(image, viewport, aspectRatio, samplesPerPixel);
 
-	file::writePpm(argv[argc > 1 ? 1 : 0], framebuffer);
+	file::writePpm(argv[argc > 1 ? 1 : 0], image);
 
 	return 0;
 }

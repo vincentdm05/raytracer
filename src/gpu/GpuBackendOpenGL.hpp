@@ -4,7 +4,7 @@
 
 #include "GpuBackend.hpp"
 
-#include "Framebuffer.hpp"
+#include "Image.hpp"
 
 #include <GL/glew.h>
 #include <iostream>
@@ -21,58 +21,58 @@ struct OpengGLTextureDesc
 	GLenum format;
 	GLenum type;
 
-	OpengGLTextureDesc(const Framebuffer &image);
+	OpengGLTextureDesc(const Image &image);
 };
 
-OpengGLTextureDesc::OpengGLTextureDesc(const Framebuffer &image)
+OpengGLTextureDesc::OpengGLTextureDesc(const Image &image)
 {
-	FramebufferDesc framebufferDesc = image.getDesc();
+	ImageDesc imageDesc = image.getDesc();
 
 	// Only support a limited subset of textures for the moment
 	target = GL_TEXTURE_2D;
 	level = 0;
-	width = framebufferDesc.width;
-	height = framebufferDesc.height;
+	width = imageDesc.width;
+	height = imageDesc.height;
 	border = 0;
 
-	switch (framebufferDesc.format)
+	switch (imageDesc.format)
 	{
-		case FramebufferFormat::r32f:
+		case ImageFormat::r32f:
 		{
 			internalformat = GL_R32F;
 			format = GL_RED;
 			type = GL_FLOAT;
 			break;
 		}
-		case FramebufferFormat::r32ui:
+		case ImageFormat::r32ui:
 		{
 			internalformat = GL_R32UI;
 			format = GL_RED;
 			type = GL_UNSIGNED_INT;
 			break;
 		}
-		case FramebufferFormat::r32si:
+		case ImageFormat::r32si:
 		{
 			internalformat = GL_R32I;
 			format = GL_RED;
 			type = GL_FLOAT;
 			break;
 		}
-		case FramebufferFormat::r32g32b32f:
+		case ImageFormat::r32g32b32f:
 		{
 			internalformat = GL_RGB32F;
 			format = GL_RGB;
 			type = GL_FLOAT;
 			break;
 		}
-		case FramebufferFormat::r32g32b32ui:
+		case ImageFormat::r32g32b32ui:
 		{
 			internalformat = GL_RGB32UI;
 			format = GL_RGB;
 			type = GL_UNSIGNED_INT;
 			break;
 		}
-		case FramebufferFormat::r32g32b32si:
+		case ImageFormat::r32g32b32si:
 		{
 			internalformat = GL_RGB32I;
 			format = GL_RGB;
@@ -106,7 +106,7 @@ public:
 	virtual bool end() override;
 	virtual bool render() override;
 
-	virtual void updateDisplayImage(const Framebuffer &image) override;
+	virtual void updateDisplayImage(const Image &image) override;
 	virtual void setViewport(int x, int y, uint width, uint height) override;
 };
 
@@ -330,7 +330,7 @@ bool GpuBackendOpenGL::render()
 	return checkGLErrors(std::string("frame #") + std::to_string(frameNumber++));
 }
 
-void GpuBackendOpenGL::updateDisplayImage(const Framebuffer &image)
+void GpuBackendOpenGL::updateDisplayImage(const Image &image)
 {
 	glBindTexture(GL_TEXTURE_2D, displayTexture);
 	const byte *data = image.getData();

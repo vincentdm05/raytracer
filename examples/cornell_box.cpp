@@ -4,7 +4,7 @@
 #include "Camera.hpp"
 #include "DiffuseLight.hpp"
 #include "File.hpp"
-#include "Framebuffer.hpp"
+#include "Image.hpp"
 #include "Lambertian.hpp"
 #include "Metal.hpp"
 #include "Raytrace.hpp"
@@ -20,11 +20,11 @@ int main(int argc, char *argv[])
 	const uint height = 256;
 	const Real aspectRatio = 1.0;
 	Viewport viewport(height * aspectRatio, height);
-	FramebufferDesc fbDesc;
-	fbDesc.width = viewport.width();
-	fbDesc.height = viewport.height();
-	fbDesc.format = FramebufferFormat::r32g32b32f;
-	Framebuffer framebuffer(fbDesc);
+	ImageDesc imageDesc;
+	imageDesc.width = viewport.width();
+	imageDesc.height = viewport.height();
+	imageDesc.format = ImageFormat::r32g32b32f;
+	Image image(imageDesc);
 
 	Vec3 cameraPosition(278.0, 278.0, -800.0);
 	Vec3 focusPosition(278.0, 278.0, 0.0);
@@ -56,12 +56,12 @@ int main(int argc, char *argv[])
 	Box bigBox(Transform(axisAngleToQuat(Vec3(0.0, 1.0, 0.0), pi() / 180.0 * 15.0), Vec3(368.5, 165.0, 351.5), 1.0), Vec3(165.0, 330.0, 165.0), white);
 	scene.add(bigBox);
 
-	Raytrace raytrace(scene, camera, viewport, framebuffer);
+	Raytrace raytrace(scene, camera, viewport, image);
 	raytrace.setSamplesPerPixel(samplesPerPixel);
 	Renderer renderer;
 	renderer.render(raytrace);
 
-	file::writePpm(argv[argc > 1 ? 1 : 0], framebuffer, 255);
+	file::writePpm(argv[argc > 1 ? 1 : 0], image, 255);
 
 	return 0;
 }

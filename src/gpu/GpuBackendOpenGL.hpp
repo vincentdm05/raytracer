@@ -37,42 +37,42 @@ OpengGLTextureDesc::OpengGLTextureDesc(const Framebuffer &image)
 
 	switch (framebufferDesc.format)
 	{
-		case FBFormat_r32f:
+		case FramebufferFormat::r32f:
 		{
 			internalformat = GL_R32F;
 			format = GL_RED;
 			type = GL_FLOAT;
 			break;
 		}
-		case FBFormat_r32ui:
+		case FramebufferFormat::r32ui:
 		{
 			internalformat = GL_R32UI;
 			format = GL_RED;
 			type = GL_UNSIGNED_INT;
 			break;
 		}
-		case FBFormat_r32si:
+		case FramebufferFormat::r32si:
 		{
 			internalformat = GL_R32I;
 			format = GL_RED;
 			type = GL_FLOAT;
 			break;
 		}
-		case FBFormat_r32g32b32f:
+		case FramebufferFormat::r32g32b32f:
 		{
 			internalformat = GL_RGB32F;
 			format = GL_RGB;
 			type = GL_FLOAT;
 			break;
 		}
-		case FBFormat_r32g32b32ui:
+		case FramebufferFormat::r32g32b32ui:
 		{
 			internalformat = GL_RGB32UI;
 			format = GL_RGB;
 			type = GL_UNSIGNED_INT;
 			break;
 		}
-		case FBFormat_r32g32b32si:
+		case FramebufferFormat::r32g32b32si:
 		{
 			internalformat = GL_RGB32I;
 			format = GL_RGB;

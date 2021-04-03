@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
 	FramebufferDesc fbDesc;
 	fbDesc.width = viewport.width();
 	fbDesc.height = viewport.height();
-	fbDesc.format = FramebufferFormat::FBFormat_r32g32b32f;
+	fbDesc.format = FramebufferFormat::r32g32b32f;
 	Framebuffer framebuffer(fbDesc);
 
 	// renderScene1(framebuffer, viewport, samplesPerPixel);

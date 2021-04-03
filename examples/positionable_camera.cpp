@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 	FramebufferDesc fbDesc;
 	fbDesc.width = viewport.width();
 	fbDesc.height = viewport.height();
-	fbDesc.format = FramebufferFormat::FBFormat_r32g32b32f;
+	fbDesc.format = FramebufferFormat::r32g32b32f;
 	Framebuffer framebuffer(fbDesc);
 	Camera camera(Vec3(0, 0, 1), Vec3(0, 0, -1), Vec3(0, 1, 0), 45, viewport, 0.5, 2.0);
 

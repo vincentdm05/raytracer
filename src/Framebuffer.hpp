@@ -6,10 +6,10 @@
 
 #include <cstring>	// For memcpy
 
-enum FramebufferFormat
+enum class FramebufferFormat
 {
 	// How to read:
-	// FBFormat_AX[BY[CZ[DW]]]F
+	// FramebufferFormat::AX[BY[CZ[DW]]]F
 	// Where A, B, C and D are channel names (e.g. r, g, b or a)
 	// X, Y, Z and W are channel lengths (e.g. 8, 16 or 32)
 	// F is the underlying format. See below:
@@ -19,19 +19,20 @@ enum FramebufferFormat
 	// un: unsigned normalized [0, 1]
 	// sn: signed normalized [-1, 1]
 
-	FBFormat_Invalid,
+	Invalid,
 
-	// TODO: add support for more formats
 	// 32 bits per channel
 	// 1 channel
-	FBFormat_r32f,
-	FBFormat_r32ui,
-	FBFormat_r32si,
+	r32f,
+	r32ui,
+	r32si,
 
 	// 3 channels
-	FBFormat_r32g32b32f,
-	FBFormat_r32g32b32ui,
-	FBFormat_r32g32b32si,
+	r32g32b32f,
+	r32g32b32ui,
+	r32g32b32si,
+
+	Count
 };
 
 // Descriptor for the framebuffer construction
@@ -39,7 +40,7 @@ struct FramebufferDesc
 {
 	uint width = 1;
 	uint height = 1;
-	FramebufferFormat format = FBFormat_r32f;
+	FramebufferFormat format = FramebufferFormat::r32f;
 
 	bool operator==(const FramebufferDesc &other) const;
 	bool operator!=(const FramebufferDesc &other) const { return !(*this == other); }
@@ -100,29 +101,50 @@ Framebuffer::Framebuffer(const FramebufferDesc &desc)
 	aspectRatio = Real(descriptor.width) / Real(descriptor.height);
 
 	// Number of channels
-	channelAmount = 0;
-	if (descriptor.format >= FBFormat_r32g32b32f)
-		channelAmount = 3;
-	else if (descriptor.format >= FBFormat_r32f)
-		channelAmount = 1;
+	switch (descriptor.format)
+	{
+		case FramebufferFormat::r32f:
+		case FramebufferFormat::r32ui:
+		case FramebufferFormat::r32si:
+		{
+			channelAmount = 1;
+			break;
+		}
+		case FramebufferFormat::r32g32b32f:
+		case FramebufferFormat::r32g32b32ui:
+		case FramebufferFormat::r32g32b32si:
+		{
+			channelAmount = 3;
+			break;
+		}
+		default:
+			channelAmount = 0;
+	};
 
 	// Number of bytes in one pixel
-	if (descriptor.format == FBFormat_r32f ||
-		descriptor.format == FBFormat_r32g32b32f)
+	switch (descriptor.format)
 	{
-		pixelSizeInBytes = sizeof(float);
-	}
-	else if (descriptor.format == FBFormat_r32ui ||
-		descriptor.format == FBFormat_r32g32b32ui)
-	{
-		pixelSizeInBytes = sizeof(uint);
-	}
-	else if (descriptor.format == FBFormat_r32si ||
-		descriptor.format == FBFormat_r32g32b32si)
-	{
-		pixelSizeInBytes = sizeof(int);
-	}
-
+		case FramebufferFormat::r32f:
+		case FramebufferFormat::r32g32b32f:
+		{
+			pixelSizeInBytes = sizeof(float);
+			break;
+		}
+		case FramebufferFormat::r32ui:
+		case FramebufferFormat::r32g32b32ui:
+		{
+			pixelSizeInBytes = sizeof(uint);
+			break;
+		}
+		case FramebufferFormat::r32si:
+		case FramebufferFormat::r32g32b32si:
+		{
+			pixelSizeInBytes = sizeof(int);
+			break;
+		}
+		default:
+			pixelSizeInBytes = 0;
+	};
 	pixelSizeInBytes *= channelAmount;
 
 	dataSize = pixelSizeInBytes * descriptor.width * descriptor.height;

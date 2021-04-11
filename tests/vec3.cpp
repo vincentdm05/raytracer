@@ -67,7 +67,7 @@ int main()
 	assert(refract(Vec3(1, -1, 0), Vec3(0, 1, 0), 1, d));
 	assert(d == Vec3(1, -1, 0));
 
-	std::cout << "All tests passed!" << std::endl;
+	std::cout << "All Vec3 tests passed!" << std::endl;
 
 	return 0;
 }

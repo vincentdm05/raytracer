@@ -86,8 +86,8 @@ public:
 
 uint Image::positionToIndex(int x, int y) const
 {
-	x = clamp(x, 0, descriptor.width - 1);
-	y = clamp(y, 0, descriptor.height - 1);
+	x = clamp(x, 0, int(descriptor.width - 1));
+	y = clamp(y, 0, int(descriptor.height - 1));
 	return uint(x + y * descriptor.width) * pixelSizeInBytes;
 }
 

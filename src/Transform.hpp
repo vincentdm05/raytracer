@@ -89,7 +89,7 @@ Ray Transform::applyInverse(const Ray &ray) const
 inline std::istream &operator>>(std::istream &is, Transform &t)
 {
 	Quat r;
-	is >> r.s >> r.v;
+	is >> r;
 	Vec3 tr;
 	is >> tr;
 	Real s;

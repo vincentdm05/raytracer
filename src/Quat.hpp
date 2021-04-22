@@ -6,44 +6,32 @@
 #include "Vec3.hpp"
 
 #include <iostream>
-#include <cmath>
 
 class Quat
 {
 public:
-	union
-	{
-		struct
-		{
-			Real s;
-			Vec3 v;
-		};
-		struct
-		{
-			Real w;
-			Real x;
-			Real y;
-			Real z;
-		};
-	};
+	Real w;
+	Real x;
+	Real y;
+	Real z;
 
 	Quat() { w = 1; x = 0; y = 0; z = 0; }
-	Quat(const Quat &q) { s = q.s; v = q.v; }
-	Quat(Quat && q) { s = std::move(q.s); v = std::move(q.v); }
+	Quat(const Quat &q) { w = q.w; x = q.x; y = q.y; z = q.z; }
+	Quat(Quat && q) { w = std::move(q.w); x = std::move(q.x); y = std::move(q.y); z = std::move(q.z); }
 	Quat(Real _w, Real _x, Real _y, Real _z) { w = _w; x = _x; y = _y; z = _z; }
-	Quat(Real _s, const Vec3 &_v) { s = _s; v = _v; }
+	Quat(Real s, const Vec3 &v) { w = s; x = v.x; y = v.y; z = v.z; }
 	~Quat() = default;
 
-	inline Quat &operator=(const Quat &other) { if (this != &other) { s = other.s; v = other.v; }; return *this; }
-	inline Quat &operator=(Quat && q) { s = std::move(q.s); v = std::move(q.v); return *this; }
+	inline Quat &operator=(const Quat &q) { if (this != &q) { w = q.w; x = q.x; y = q.y; z = q.z; }; return *this; }
+	inline Quat &operator=(Quat && q) { w = std::move(q.w); x = std::move(q.x); y = std::move(q.y); z = std::move(q.z); return *this; }
 
-	inline bool operator==(const Quat &q) const { return s == q.s && v == q.v; }
-	inline bool operator!=(const Quat &q) const { return s != q.s || v != q.v; }
+	inline bool operator==(const Quat &q) const { return w == q.w && x == q.x && y == q.y && z == q.z; }
+	inline bool operator!=(const Quat &q) const { return w != q.w || x != q.x || y != q.y || z != q.z; }
 
 	inline Quat &operator+() { return *this; }
-	inline Quat operator-() const { return Quat(-s, -v); }
-	inline Real operator[](uint i) const { if (i == 0) return s; return v[i - 1]; }
-	inline Real &operator[](uint i) { if (i == 0) return s; return v[i - 1]; }
+	inline Quat operator-() const { return Quat(-w, -x, -y, -z); }
+	inline Real operator[](uint i) const { i = min(i, 3u); return *(&w + i); }
+	inline Real &operator[](uint i) { i = min(i, 3u); return *(&w + i); }
 
 	inline Quat &operator+=(const Quat &q);
 	inline Quat &operator-=(const Quat &q);
@@ -54,9 +42,9 @@ public:
 	inline Quat &operator*=(Real c);
 	inline Quat &operator/=(Real c);
 
-	inline Quat getConjugate() const { return Quat(s, -v); }
+	inline Quat getConjugate() const { return Quat(w, -x, -y, -z); }
 	inline Quat &conjugate();
-	inline Real squaredNorm() const { return s * s + v.squaredLength(); }
+	inline Real squaredNorm() const { return w * w + x * x + y * y + z * z; }
 	inline Real norm() const { return sqrt(squaredNorm()); }
 	inline Quat normalized() const;
 	inline Quat &normalize();
@@ -68,27 +56,35 @@ public:
 
 inline Quat &Quat::operator+=(const Quat &q)
 {
-	s += q.s;
-	v += q.v;
+	w += q.w;
+	x += q.x;
+	y += q.y;
+	z += q.z;
 	return *this;
 }
 
 inline Quat &Quat::operator-=(const Quat &q)
 {
-	s -= q.s;
-	v -= q.v;
+	w -= q.w;
+	x -= q.x;
+	y -= q.y;
+	z -= q.z;
 	return *this;
 }
 
 // Note that this is equivalent to:
 // *this = *this * q;
-// Remember that chaining rotations is done in reverse order
+// Remember that chaining rotations is done from right to left
 inline Quat &Quat::operator*=(const Quat &q)
 {
-	Real newS = s * q.s - dot(v, q.v);
-	Vec3 newV = s * q.v + q.s * v + cross(v, q.v);
-	s = newS;
-	v = newV;
+	Vec3 v1(x, y, z);
+	Vec3 v2(q.x, q.y, q.z);
+	Real newW = w * q.w - dot(v1, v2);
+	v1 = w * v2 + q.w * v1 + cross(v1, v2);
+	w = newW;
+	x = v1.x;
+	y = v1.y;
+	z = v1.z;
 	return *this;
 }
 
@@ -101,35 +97,45 @@ inline Quat &Quat::operator/=(const Quat &q)
 
 inline Quat &Quat::operator+=(Real c)
 {
-	s += c;
-	v += c;
+	w += c;
+	x += c;
+	y += c;
+	z += c;
 	return *this;
 }
 
 inline Quat &Quat::operator-=(Real c)
 {
-	s -= c;
-	v -= c;
+	w -= c;
+	x -= c;
+	y -= c;
+	z -= c;
 	return *this;
 }
 
 inline Quat &Quat::operator*=(Real c)
 {
-	s *= c;
-	v *= c;
+	w *= c;
+	x *= c;
+	y *= c;
+	z *= c;
 	return *this;
 }
 
 inline Quat &Quat::operator/=(Real c)
 {
-	s /= c;
-	v /= c;
+	w /= c;
+	x /= c;
+	y /= c;
+	z /= c;
 	return *this;
 }
 
 inline Quat &Quat::conjugate()
 {
-	v = -v;
+	x = -x;
+	y = -y;
+	z = -z;
 	return *this;
 }
 
@@ -182,42 +188,44 @@ inline Quat &Quat::reciprocate()
 
 inline void Quat::getAxisAngle(Vec3 &axisOut, Real &angleOut) const
 {
-	angleOut = 2.0 * acos(s);
+	angleOut = 2.0 * acos(w);
 	if (angleOut == 0)
 	{
 		axisOut = Vec3();
 	}
 	else
 	{
-		axisOut = v / sqrt(1.0 - s * s);
+		axisOut = Vec3(x, y, z) / sqrt(1.0 - w * w);
 	}
 }
 
 inline std::istream &operator>>(std::istream &is, Quat &q)
 {
-	is >> q.s >> q.v;
+	is >> q.w >> q.x >> q.y >> q.z;
 	return is;
 }
 
 inline std::ostream &operator<<(std::ostream &os, const Quat &q)
 {
-	os << "Quat(" << q.s << ", " << q.v << ")";
+	os << "Quat(" << q.w << ", " << q.x << ", " << q.y << ", " << q.z << ")";
 	return os;
 }
 
 inline Quat operator+(const Quat &a, const Quat &b)
 {
-	return Quat(a.s + b.s, a.v + b.v);
+	return Quat(a.w + b.w, a.x + b.x, a.y + b.y, a.z + b.z);
 }
 
 inline Quat operator-(const Quat &a, const Quat &b)
 {
-	return Quat(a.s - b.s, a.v - b.v);
+	return Quat(a.w - b.w, a.x - b.x, a.y - b.y, a.z - b.z);
 }
 
 inline Quat operator*(const Quat &a, const Quat &b)
 {
-	return Quat(a.s * b.s - dot(a.v, b.v), a.s * b.v + b.s * a.v + cross(a.v, b.v));
+	Vec3 a_v(a.x, a.y, a.z);
+	Vec3 b_v(b.x, b.y, b.z);
+	return Quat(a.w * b.w - dot(a_v, b_v), a.w * b_v + b.w * a_v + cross(a_v, b_v));
 }
 
 inline Quat operator/(const Quat &a, const Quat &b)
@@ -227,22 +235,22 @@ inline Quat operator/(const Quat &a, const Quat &b)
 
 inline Quat operator+(const Quat &q, Real c)
 {
-	return Quat(q.s + c, q.v + c);
+	return Quat(q.w + c, q.x + c, q.y + c, q.z + c);
 }
 
 inline Quat operator-(const Quat &q, Real c)
 {
-	return Quat(q.s - c, q.v - c);
+	return Quat(q.w - c, q.x - c, q.y - c, q.z - c);
 }
 
 inline Quat operator*(const Quat &q, Real c)
 {
-	return Quat(q.s * c, q.v * c);
+	return Quat(q.w * c, q.x * c, q.y * c, q.z * c);
 }
 
 inline Quat operator/(const Quat &q, Real c)
 {
-	return Quat(q.s / c, q.v / c);
+	return Quat(q.w / c, q.x / c, q.y / c, q.z / c);
 }
 
 inline Quat operator+(Real c, const Quat &q)
@@ -267,27 +275,27 @@ inline Quat operator/(Real c, const Quat &q)
 
 inline Real min(const Quat &q)
 {
-	return min(q.s, min(q.v));
+	return min(min(q.w, q.x), min(q.y, q.z));
 }
 
 inline Quat min(const Quat &a, const Quat &b)
 {
-	return Quat(min(a.s, b.s), min(a.v, b.v));
+	return Quat(min(a.w, b.w), min(a.x, b.x), min(a.y, b.y), min(a.z, b.z));
 }
 
 inline Real max(const Quat &q)
 {
-	return max(q.s, max(q.v));
+	return max(max(q.w, q.x), max(q.y, q.z));
 }
 
 inline Quat max(const Quat &a, const Quat &b)
 {
-	return Quat(max(a.s, b.s), max(a.v, b.v));
+	return Quat(max(a.w, b.w), max(a.x, b.x), max(a.y, b.y), max(a.z, b.z));
 }
 
 inline Quat abs(const Quat &q)
 {
-	return Quat(abs(q.s), abs(q.v));
+	return Quat(abs(q.w), abs(q.x), abs(q.y), abs(q.z));
 }
 
 inline bool closeEnough(const Quat &a, const Quat &b, Real epsilon)
@@ -303,12 +311,12 @@ inline Quat lerp(const Quat &a, const Quat &b, Real t)
 
 inline Real dot(const Quat &a, const Quat &b)
 {
-	return a.s * b.s + dot(a.v, b.v);
+	return a.w * b.w + a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
 inline Quat conjugate(const Quat &q)
 {
-	return Quat(q.s, -q.v);
+	return Quat(q.w, -q.x, -q.y, -q.z);
 }
 
 inline Quat normalize(const Quat &q)
@@ -346,9 +354,10 @@ inline Quat axisAngleToQuat(const Vec3 &axis, Real angle)
 
 inline Vec3 rotate(const Vec3 &v, const Quat &q)
 {
-	Vec3 res = dot(v, q.v) * q.v;
-	res += q.s * cross(q.v, v);
+	Vec3 q_v(q.x, q.y, q.z);
+	Vec3 res = dot(v, q_v) * q_v;
+	res += q.w * cross(q_v, v);
 	res *= 2;
-	res += (q.s * q.s - q.v.squaredLength()) * v;
+	res += (q.w * q.w - q_v.squaredLength()) * v;
 	return res;
 }

@@ -46,6 +46,8 @@ Transform::Transform(const Quat &_rotation, const Vec3 &_translation, Real _scal
 void Transform::setScale(Real _s)
 {
 	// Careful with scale close to zero
+	if (_s <= 0.0)
+		_s = 1.0;
 	s = _s;
 	invS = 1.0 / _s;
 }
@@ -104,4 +106,11 @@ inline std::ostream &operator<<(std::ostream &os, const Transform &t)
 {
 	os << "Transform(" << t.rotation() << ", " << t.translation() << ", " << t.scale() << ")";
 	return os;
+}
+
+inline bool closeEnough(const Transform &a, const Transform &b, Real epsilon)
+{
+	return closeEnough(a.scale(), b.scale(), epsilon) &&
+		closeEnough(a.rotation(), b.rotation(), epsilon) &&
+		closeEnough(a.translation(), b.translation(), epsilon);
 }

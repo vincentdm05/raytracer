@@ -70,3 +70,8 @@ inline Real clamp(Real a, Real lower, Real upper)
 {
 	return min(upper, max(lower, a));
 }
+
+inline bool closeEnough(Real a, Real b, Real epsilon)
+{
+	return abs(a - b) < epsilon;
+}

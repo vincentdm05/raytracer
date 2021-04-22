@@ -4,8 +4,6 @@
 
 #include "Math.hpp"
 
-#include <cassert>
-#include <cmath>
 #include <iostream>
 
 class Vec3
@@ -138,7 +136,7 @@ inline std::istream &operator>>(std::istream &is, Vec3 &v)
 
 inline std::ostream &operator<<(std::ostream &os, const Vec3 &v)
 {
-	os << v.x << " " << v.y << " " << v.z;
+	os << "Vec3(" << v.x << ", " << v.y << ", " << v.z << ")";
 	return os;
 }
 
@@ -225,6 +223,11 @@ inline Vec3 max(const Vec3 &a, const Vec3 &b)
 inline Vec3 abs(const Vec3 &v)
 {
 	return Vec3(abs(v.x), abs(v.y), abs(v.z));
+}
+
+inline bool closeEnough(const Vec3 &a, const Vec3 &b, Real epsilon)
+{
+	return max(abs(a - b)) < epsilon;
 }
 
 inline bool all(const Vec3 &v)

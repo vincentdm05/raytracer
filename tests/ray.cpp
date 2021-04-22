@@ -4,11 +4,9 @@
 #undef NDEBUG
 #endif
 
+#include "Debug.hpp"
 #include "Ray.hpp"
 #include "Vec3.hpp"
-
-#include <cassert>
-#include <iostream>
 
 int main()
 {
@@ -21,8 +19,6 @@ int main()
 	assert(r1.origin() == Vec3(0, 0, 1));
 	assert(r1.direction() == normalize(Vec3(0, 0, -1)));
 	assert(r1.to(1) == Vec3());
-
-	std::cout << "All Ray tests passed!" << std::endl;
 
 	return 0;
 }

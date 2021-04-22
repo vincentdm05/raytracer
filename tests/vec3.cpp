@@ -4,10 +4,8 @@
 #undef NDEBUG
 #endif
 
+#include "Debug.hpp"
 #include "Vec3.hpp"
-
-#include <cassert>
-#include <iostream>
 
 int main()
 {
@@ -66,8 +64,6 @@ int main()
 	Vec3 d;
 	assert(refract(Vec3(1, -1, 0), Vec3(0, 1, 0), 1, d));
 	assert(d == Vec3(1, -1, 0));
-
-	std::cout << "All Vec3 tests passed!" << std::endl;
 
 	return 0;
 }

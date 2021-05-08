@@ -49,8 +49,8 @@ void Viewer::normalizeImage(Image &image) const
 	uint width = image.getWidth();
 	uint height = image.getHeight();
 	uint channelAmount = image.getChannelAmount();
-	// Assuming image has primitive type float
-	float stagingPixel[channelAmount];
+	// Assuming image has primitive type float and max channel amount is 4
+	float stagingPixel[4];
 	float imageMax = 0.0f;
 	for (uint y = 0; y < height; y++)
 	{

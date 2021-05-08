@@ -21,7 +21,7 @@ do_test()
 	testName="$1"
 	testPath="$2"
 
-	execName="$( "${testsDir}"/../tools/build.sh "${testPath}" -r "${testsDir}/../src/" -b "${testsDir}/../bin/test/" )"
+	execName="$( "${testsDir}"/../tools/build.sh "${testPath}" -r "${testsDir}/../src/" -b "${testsDir}/../bin/tests/" )"
 
 	if [[ $? -ne 0 ]]; then
 		echo 1>&2

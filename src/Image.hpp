@@ -86,15 +86,15 @@ public:
 
 uint Image::positionToIndex(int x, int y) const
 {
-	x = clamp(x, 0, int(descriptor.width - 1));
-	y = clamp(y, 0, int(descriptor.height - 1));
+	x = math::clamp(x, 0, int(descriptor.width - 1));
+	y = math::clamp(y, 0, int(descriptor.height - 1));
 	return uint(x + y * descriptor.width) * pixelSizeInBytes;
 }
 
 Image::Image(const ImageDesc &desc)
 {
-	descriptor.width = max(desc.width, 1u);
-	descriptor.height = max(desc.height, 1u);
+	descriptor.width = math::max(desc.width, 1u);
+	descriptor.height = math::max(desc.height, 1u);
 	descriptor.format = desc.format;
 
 	aspectRatio = Real(descriptor.width) / Real(descriptor.height);

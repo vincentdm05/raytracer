@@ -39,21 +39,21 @@ int main(int argc, char *argv[])
 	Scene scene;
 	scene.setBackground(Background(Vec3(0.0, 0.0, 0.0), Vec3(0.0, 0.0, 0.0)));
 
-	Rect redWall(Transform(axisAngleToQuat(Vec3(0.0, 1.0, 0.0), pi() * -0.5), Vec3(555.0, 277.5, 277.5), 1.0), 555.0, 555.0, red);
+	Rect redWall(Transform(axisAngleToQuat(Vec3(0.0, 1.0, 0.0), math::pi() * -0.5), Vec3(555.0, 277.5, 277.5), 1.0), 555.0, 555.0, red);
 	scene.add(redWall);
-	Rect greenWall(Transform(axisAngleToQuat(Vec3(0.0, 1.0, 0.0), pi() * 0.5), Vec3(0.0, 277.5, 277.5), 1.0), 555.0, 555.0, green);
+	Rect greenWall(Transform(axisAngleToQuat(Vec3(0.0, 1.0, 0.0), math::pi() * 0.5), Vec3(0.0, 277.5, 277.5), 1.0), 555.0, 555.0, green);
 	scene.add(greenWall);
-	Rect ceilingLight(Transform(axisAngleToQuat(Vec3(1.0, 0.0, 0.0), pi() * -0.5), Vec3(278.0, 554.0, 279.5), 1.0), 130.0, 105.0, lightMaterial);
+	Rect ceilingLight(Transform(axisAngleToQuat(Vec3(1.0, 0.0, 0.0), math::pi() * -0.5), Vec3(278.0, 554.0, 279.5), 1.0), 130.0, 105.0, lightMaterial);
 	scene.add(ceilingLight);
-	Rect ceilingWall(Transform(axisAngleToQuat(Vec3(1.0, 0.0, 0.0), pi() * 0.5), Vec3(277.5, 555.0, 277.5), 1.0), 555.0, 555.0, white);
+	Rect ceilingWall(Transform(axisAngleToQuat(Vec3(1.0, 0.0, 0.0), math::pi() * 0.5), Vec3(277.5, 555.0, 277.5), 1.0), 555.0, 555.0, white);
 	scene.add(ceilingWall);
-	Rect floorWall(Transform(axisAngleToQuat(Vec3(1.0, 0.0, 0.0), pi() * -0.5), Vec3(277.5, 0.0, 277.5), 1.0), 555.0, 555.0, white);
+	Rect floorWall(Transform(axisAngleToQuat(Vec3(1.0, 0.0, 0.0), math::pi() * -0.5), Vec3(277.5, 0.0, 277.5), 1.0), 555.0, 555.0, white);
 	scene.add(floorWall);
-	Rect backWall(Transform(axisAngleToQuat(Vec3(1.0, 0.0, 0.0), pi()), Vec3(277.5, 277.5, 555.0), 1.0), 555.0, 555.0, white);
+	Rect backWall(Transform(axisAngleToQuat(Vec3(1.0, 0.0, 0.0), math::pi()), Vec3(277.5, 277.5, 555.0), 1.0), 555.0, 555.0, white);
 	scene.add(backWall);
-	Box smallBox(Transform(axisAngleToQuat(Vec3(0.0, 1.0, 0.0), pi() / 180.0 * -18.0), Vec3(185.5, 82.5, 169.0), 1.0), Vec3(165.0, 165.0, 165.0), white);
+	Box smallBox(Transform(axisAngleToQuat(Vec3(0.0, 1.0, 0.0), math::pi() / 180.0 * -18.0), Vec3(185.5, 82.5, 169.0), 1.0), Vec3(165.0, 165.0, 165.0), white);
 	scene.add(smallBox);
-	Box bigBox(Transform(axisAngleToQuat(Vec3(0.0, 1.0, 0.0), pi() / 180.0 * 15.0), Vec3(368.5, 165.0, 351.5), 1.0), Vec3(165.0, 330.0, 165.0), white);
+	Box bigBox(Transform(axisAngleToQuat(Vec3(0.0, 1.0, 0.0), math::pi() / 180.0 * 15.0), Vec3(368.5, 165.0, 351.5), 1.0), Vec3(165.0, 330.0, 165.0), white);
 	scene.add(bigBox);
 
 	Raytrace raytrace(scene, camera, viewport, image);

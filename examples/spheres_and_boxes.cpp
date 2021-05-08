@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 	Sphere hitable1(focusPosition + Vec3(-1.0, 0.0, 0.0), 0.5, material1);
 	Sphere hitable2(focusPosition + Vec3(-0.8, 0.0, -2.0), 0.5, material2);
 	Sphere hitable3(focusPosition + Vec3(-0.6, 0.0, -4.0), 0.5, material3);
-	Quat rot = axisAngleToQuat(Vec3(1.0, 1.0, 0.0), pi() * 0.25);
+	Quat rot = axisAngleToQuat(Vec3(1.0, 1.0, 0.0), math::pi() * 0.25);
 	Vec3 ext(1.0, 1.0, 1.0);
 	Box hitable4(Transform(rot, focusPosition + Vec3(1.0, 0.0, 0.0), 0.6), ext, material4);
 	Box hitable5(Transform(rot, focusPosition + Vec3(0.8, 0.0, -2.0), 0.6), ext, material5);

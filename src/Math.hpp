@@ -5,6 +5,9 @@
 #include <limits>
 #include <cmath>
 
+namespace math
+{
+
 inline Real pi()
 {
 	const double pi_val = 3.14159265358979323846;
@@ -71,7 +74,9 @@ inline Real clamp(Real a, Real lower, Real upper)
 	return min(upper, max(lower, a));
 }
 
+} // namespace math
+
 inline bool closeEnough(Real a, Real b, Real epsilon)
 {
-	return abs(a - b) < epsilon;
+	return math::abs(a - b) < epsilon;
 }

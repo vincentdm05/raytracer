@@ -30,8 +30,8 @@ public:
 
 	inline Quat &operator+() { return *this; }
 	inline Quat operator-() const { return Quat(-w, -x, -y, -z); }
-	inline Real operator[](uint i) const { i = min(i, 3u); return *(&w + i); }
-	inline Real &operator[](uint i) { i = min(i, 3u); return *(&w + i); }
+	inline Real operator[](uint i) const { i = math::min(i, 3u); return *(&w + i); }
+	inline Real &operator[](uint i) { i = math::min(i, 3u); return *(&w + i); }
 
 	inline Quat &operator+=(const Quat &q);
 	inline Quat &operator-=(const Quat &q);
@@ -275,27 +275,27 @@ inline Quat operator/(Real c, const Quat &q)
 
 inline Real min(const Quat &q)
 {
-	return min(min(q.w, q.x), min(q.y, q.z));
+	return math::min(math::min(q.w, q.x), math::min(q.y, q.z));
 }
 
 inline Quat min(const Quat &a, const Quat &b)
 {
-	return Quat(min(a.w, b.w), min(a.x, b.x), min(a.y, b.y), min(a.z, b.z));
+	return Quat(math::min(a.w, b.w), math::min(a.x, b.x), math::min(a.y, b.y), math::min(a.z, b.z));
 }
 
 inline Real max(const Quat &q)
 {
-	return max(max(q.w, q.x), max(q.y, q.z));
+	return math::max(math::max(q.w, q.x), math::max(q.y, q.z));
 }
 
 inline Quat max(const Quat &a, const Quat &b)
 {
-	return Quat(max(a.w, b.w), max(a.x, b.x), max(a.y, b.y), max(a.z, b.z));
+	return Quat(math::max(a.w, b.w), math::max(a.x, b.x), math::max(a.y, b.y), math::max(a.z, b.z));
 }
 
 inline Quat abs(const Quat &q)
 {
-	return Quat(abs(q.w), abs(q.x), abs(q.y), abs(q.z));
+	return Quat(math::abs(q.w), math::abs(q.x), math::abs(q.y), math::abs(q.z));
 }
 
 inline bool closeEnough(const Quat &a, const Quat &b, Real epsilon)
@@ -305,7 +305,7 @@ inline bool closeEnough(const Quat &a, const Quat &b, Real epsilon)
 
 inline Quat lerp(const Quat &a, const Quat &b, Real t)
 {
-	t = clamp(t, Real(0), Real(1));
+	t = math::clamp(t, Real(0), Real(1));
 	return (1 - t) * a + t * b;
 }
 

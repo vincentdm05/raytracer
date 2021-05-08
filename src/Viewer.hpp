@@ -59,7 +59,7 @@ void Viewer::normalizeImage(Image &image) const
 			image.load(x, y, (byte*)stagingPixel);
 			for (uint c = 0; c < channelAmount; c++)
 			{
-				imageMax = max(imageMax, stagingPixel[c]);
+				imageMax = math::max(imageMax, stagingPixel[c]);
 			}
 		}
 	}

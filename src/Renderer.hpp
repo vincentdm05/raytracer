@@ -61,8 +61,8 @@ void Renderer::renderTile(const PixelRenderer &pixelRenderer, uint tileX, uint t
 	uint tileOffsetX = tileX * tileSize;
 	uint tileOffsetY = tileY * tileSize;
 
-	uint stopX = min(tileOffsetX + tileSize, vp.width());
-	uint stopY = min(tileOffsetY + tileSize, vp.height());
+	uint stopX = math::min(tileOffsetX + tileSize, vp.width());
+	uint stopY = math::min(tileOffsetY + tileSize, vp.height());
 	for (uint row = tileOffsetY; row < stopY; row++)
 	{
 		for (uint col = tileOffsetX; col < stopX; col++)
@@ -154,7 +154,7 @@ void Renderer::makeGrid(uint width, uint height)
 	int dx = 0;
 	int dy = -1;
 	int temp = 0;
-	uint maxSize = max(width, height);
+	uint maxSize = math::max(width, height);
 	maxSize *= maxSize;
 	for (uint i = 0; i < maxSize; i++)
 	{
@@ -222,7 +222,7 @@ void Renderer::finish()
 
 Renderer::Renderer()
 {
-	nThreads = max(std::thread::hardware_concurrency(), 1u);
+	nThreads = math::max(std::thread::hardware_concurrency(), 1u);
 	futures.reserve(nThreads);
 }
 

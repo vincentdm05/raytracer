@@ -40,7 +40,7 @@ void renderScene1(Image &image, const Viewport &viewport, uint samplesPerPixel)
 	scene.add(metalRectangle1);
 	Rect metalRectangle2(Transform(Quat(), focusPosition + Vec3(0.0, 0.0, 2.0), 1.0), 4.0, 1.07, metalMaterial);
 	scene.add(metalRectangle2);
-	Rect lightRect1(Transform(axisAngleToQuat(Vec3(1.0, 0.0, 0.0), pi() * 0.5), focusPosition + Vec3(0.0, 0.5, 0.0), 1.0), 3.0, 3.0, lightMaterial);
+	Rect lightRect1(Transform(axisAngleToQuat(Vec3(1.0, 0.0, 0.0), math::pi() * 0.5), focusPosition + Vec3(0.0, 0.5, 0.0), 1.0), 3.0, 3.0, lightMaterial);
 	scene.add(lightRect1);
 
 	Raytrace raytrace(scene, camera, viewport, image);
@@ -70,19 +70,19 @@ void renderScene2(Image &image, const Viewport &viewport, Real aspectRatio, uint
 
 	const Real boxHeight = 555.0;
 	const Real boxWidth = boxHeight * aspectRatio;
-	Rect redWall(Transform(axisAngleToQuat(Vec3(0.0, 1.0, 0.0), pi() * -0.5), Vec3((boxWidth - boxHeight) * 0.5 + boxHeight, boxHeight * 0.5, boxHeight * 0.5), 1.0), boxHeight, boxHeight, red);
+	Rect redWall(Transform(axisAngleToQuat(Vec3(0.0, 1.0, 0.0), math::pi() * -0.5), Vec3((boxWidth - boxHeight) * 0.5 + boxHeight, boxHeight * 0.5, boxHeight * 0.5), 1.0), boxHeight, boxHeight, red);
 	scene.add(redWall);
-	Rect greenWall(Transform(axisAngleToQuat(Vec3(0.0, 1.0, 0.0), pi() * 0.5), Vec3(-(boxWidth - boxHeight) * 0.5, boxHeight * 0.5, boxHeight * 0.5), 1.0), boxHeight, boxHeight, green);
+	Rect greenWall(Transform(axisAngleToQuat(Vec3(0.0, 1.0, 0.0), math::pi() * 0.5), Vec3(-(boxWidth - boxHeight) * 0.5, boxHeight * 0.5, boxHeight * 0.5), 1.0), boxHeight, boxHeight, green);
 	scene.add(greenWall);
-	Rect ceilingWall(Transform(axisAngleToQuat(Vec3(1.0, 0.0, 0.0), pi() * 0.5), Vec3(boxHeight * 0.5, boxHeight, boxHeight * 0.5), 1.0), boxWidth, boxHeight, lightMaterial);
+	Rect ceilingWall(Transform(axisAngleToQuat(Vec3(1.0, 0.0, 0.0), math::pi() * 0.5), Vec3(boxHeight * 0.5, boxHeight, boxHeight * 0.5), 1.0), boxWidth, boxHeight, lightMaterial);
 	scene.add(ceilingWall);
-	Rect floorWall(Transform(axisAngleToQuat(Vec3(1.0, 0.0, 0.0), pi() * -0.5), Vec3(boxHeight * 0.5, 0.0, boxHeight * 0.5), 1.0), boxWidth, boxHeight, white);
+	Rect floorWall(Transform(axisAngleToQuat(Vec3(1.0, 0.0, 0.0), math::pi() * -0.5), Vec3(boxHeight * 0.5, 0.0, boxHeight * 0.5), 1.0), boxWidth, boxHeight, white);
 	scene.add(floorWall);
-	Rect backWall(Transform(axisAngleToQuat(Vec3(1.0, 0.0, 0.0), pi()), Vec3(boxHeight * 0.5, boxHeight * 0.5, boxHeight), 1.0), boxWidth, boxHeight, mirror);
+	Rect backWall(Transform(axisAngleToQuat(Vec3(1.0, 0.0, 0.0), math::pi()), Vec3(boxHeight * 0.5, boxHeight * 0.5, boxHeight), 1.0), boxWidth, boxHeight, mirror);
 	scene.add(backWall);
-	Box smallBox(Transform(axisAngleToQuat(Vec3(0.0, 1.0, 0.0), pi() / 180.0 * -18.0), Vec3(185.5, 82.5, 169.0), 1.0), Vec3(165.0, 165.0, 165.0), white);
+	Box smallBox(Transform(axisAngleToQuat(Vec3(0.0, 1.0, 0.0), math::pi() / 180.0 * -18.0), Vec3(185.5, 82.5, 169.0), 1.0), Vec3(165.0, 165.0, 165.0), white);
 	scene.add(smallBox);
-	Box bigBox(Transform(axisAngleToQuat(Vec3(0.0, 1.0, 0.0), pi() / 180.0 * 15.0), Vec3(368.5, 165.0, 351.5), 1.0), Vec3(165.0, 330.0, 165.0), white);
+	Box bigBox(Transform(axisAngleToQuat(Vec3(0.0, 1.0, 0.0), math::pi() / 180.0 * 15.0), Vec3(368.5, 165.0, 351.5), 1.0), Vec3(165.0, 330.0, 165.0), white);
 	scene.add(bigBox);
 
 	Raytrace raytrace(scene, camera, viewport, image);

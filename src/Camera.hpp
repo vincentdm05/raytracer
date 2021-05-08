@@ -35,7 +35,7 @@ Camera::Camera(const Vec3 &_position, const Vec3 &_direction, const Vec3 &_up, R
 	position = _position;
 	lensRadius = aperture * 0.5;
 
-	Real theta = fovY * pi() / 180.0;
+	Real theta = fovY * (math::pi() / 180.0);
 	Real halfHeight = tan(theta * 0.5);
 	Real halfWidth = halfHeight * viewport.aspectRatio();
 

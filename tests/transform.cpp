@@ -29,8 +29,8 @@ int main(int argc, char const *argv[])
 	assertEqual(a2.scale(), 2.5);
 
 	// Transformation ops
-	Transform b0(axisAngleToQuat(Vec3(0, -1, 0), pi() * 0.5), Vec3(-1, 0, 0), 0.5);
-	Transform b1(axisAngleToQuat(Vec3(0, 1, 0), pi() * 0.5), Vec3(0, 0, -2), 2.0);
+	Transform b0(axisAngleToQuat(Vec3(0, -1, 0), math::pi() * 0.5), Vec3(-1, 0, 0), 0.5);
+	Transform b1(axisAngleToQuat(Vec3(0, 1, 0), math::pi() * 0.5), Vec3(0, 0, -2), 2.0);
 	assertEqualWithTolerance(b0.inverse(), b1, 0.0001);
 	assertEqualWithTolerance(b0.apply(Vec3(1, 0, 0)), Vec3(-1, 0, 0.5), 0.0001);
 	assertEqualWithTolerance(b1.apply(Vec3(1, 0, 0)), Vec3(0, 0, -4), 0.0001);

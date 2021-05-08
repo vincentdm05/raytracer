@@ -39,7 +39,7 @@ bool writePpm(const std::string& baseFileName, const Image &image, int range = -
 	// 5 placeholder spaces (maximum supported by PPM is 65535)
 	file << "     \n";
 
-	int maxValue = max(1, range);
+	int maxValue = math::max(1, range);
 	Real colourArray[3];
 	for (int row = int(height) - 1; row >= 0; row--)
 	{
@@ -48,11 +48,11 @@ bool writePpm(const std::string& baseFileName, const Image &image, int range = -
 			image.load(col, row, (byte*)colourArray);
 			Vec3 colour(colourArray[0], colourArray[1], colourArray[2]);
 			if (range <= 0)
-				maxValue = max(int(max(colour)), maxValue);
+				maxValue = math::max(int(max(colour)), maxValue);
 			file << int(colour.r) << " " << int(colour.g) << " " << int(colour.b) << "\n";
 		}
 	}
-	maxValue = min(maxValue, 65535);
+	maxValue = math::min(maxValue, 65535);
 
 	file.seekp(headerPosForRange);
 	file << maxValue;

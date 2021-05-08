@@ -46,7 +46,7 @@ Vec3 Raytrace::gammaCorrect(const Vec3 &colour) const
 Vec3 Raytrace::getColour(const Ray &r, const Scene &scene, uint bounces) const
 {
 	HitRecord rec;
-	bool hit = scene.hit(r, 0.001, maxReal(), rec);
+	bool hit = scene.hit(r, 0.001, math::maxReal(), rec);
 
 	if (hit)
 	{

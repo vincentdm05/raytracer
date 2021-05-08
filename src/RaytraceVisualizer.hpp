@@ -36,7 +36,7 @@ public:
 Vec3 RaytraceVisualizer::getBounceColour(const Ray &r, uint bounces) const
 {
 	HitRecord rec;
-	if (scene.hit(r, 0.001, maxReal(), rec))
+	if (scene.hit(r, 0.001, math::maxReal(), rec))
 	{
 		Ray scattered;
 		Vec3 attenuation;
@@ -66,14 +66,14 @@ void RaytraceVisualizer::renderPixel(uint col, uint row) const
 		case RaytraceVisualizerTypeDepth:
 		{
 			HitRecord rec;
-			if (scene.hit(r, 0.001, maxReal(), rec))
+			if (scene.hit(r, 0.001, math::maxReal(), rec))
 				colour = Vec3(1, 1, 1) / (1.0 + rec.t);
 			break;
 		}
 		case RaytraceVisualizerTypeNormal:
 		{
 			HitRecord rec;
-			if (scene.hit(r, 0.001, maxReal(), rec))
+			if (scene.hit(r, 0.001, math::maxReal(), rec))
 				colour = rec.normal * 0.5 + 0.5;
 			break;
 		}

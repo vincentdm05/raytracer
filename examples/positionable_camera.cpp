@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 	Lambertian material0(Vec3(0, 0, 1));
 	Lambertian material1(Vec3(1, 0, 0));
 
-	Real R = cos(pi() / 4.0);
+	Real R = cos(math::pi() / 4.0);
 	Sphere sphere0(Vec3(-R, 0, -1), R, material0);
 	Sphere sphere1(Vec3(R, 0, -1), R, material1);
 

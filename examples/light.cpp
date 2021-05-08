@@ -250,9 +250,9 @@ void renderScene7(Image &image, const Viewport &viewport, uint samplesPerPixel)
 	scene.add(ground);
 	Sphere metalSphere1(focusPosition + Vec3(0.0, 0.05, 0.0), 0.5, metalMaterial);
 	scene.add(metalSphere1);
-	Rect lightRect1(Transform(axisAngleToQuat(Vec3(0.0, 1.0, 0.0), pi() * 0.45), focusPosition + Vec3(-1.0, 0.0, 0.0), 1.0), 1.5, 1.5, lightMaterial1);
+	Rect lightRect1(Transform(axisAngleToQuat(Vec3(0.0, 1.0, 0.0), math::pi() * 0.45), focusPosition + Vec3(-1.0, 0.0, 0.0), 1.0), 1.5, 1.5, lightMaterial1);
 	scene.add(lightRect1);
-	Rect lightRect2(Transform(axisAngleToQuat(Vec3(0.0, 1.0, 0.0), pi() * -0.45), focusPosition + Vec3(1.0, 0.0, 0.0), 1.0), 1.5, 1.5, lightMaterial2);
+	Rect lightRect2(Transform(axisAngleToQuat(Vec3(0.0, 1.0, 0.0), math::pi() * -0.45), focusPosition + Vec3(1.0, 0.0, 0.0), 1.0), 1.5, 1.5, lightMaterial2);
 	scene.add(lightRect2);
 	Rect lightRect3(Transform(Quat(), focusPosition + Vec3(0.0, 0.0, -1.0), 1.0), 1.5, 1.5, lightMaterial3);
 	scene.add(lightRect3);

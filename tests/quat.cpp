@@ -47,13 +47,13 @@ int main(int argc, char const *argv[])
 	e0 -= Quat(0, Vec3(1, 0, 0));
 	assert(e0 == Quat(2, Vec3(-1, 0, 0)));
 	// Quaternion representing a pi/2 rotation around the x axis
-	Quat e1 = axisAngleToQuat(Vec3(1, 0, 0), pi() * 0.5);
+	Quat e1 = axisAngleToQuat(Vec3(1, 0, 0), math::pi() * 0.5);
 	e1 *= e1;
 	Real angle;
 	Vec3 axis;
 	e1.getAxisAngle(axis, angle);
 	assertVerbose(axis.normalize() == Vec3(1, 0, 0), axis, " != ", Vec3(1, 0, 0));
-	assertVerbose(closeEnough(angle, pi(), 0.0001), angle, " != ", pi());
+	assertVerbose(closeEnough(angle, math::pi(), 0.0001), angle, " != ", math::pi());
 	e1 /= e1;
 	assertVerbose(e1 == Quat(), e1, " != ", Quat());
 	Quat e2(1, Vec3(-1, 0, 1));
@@ -82,9 +82,9 @@ int main(int argc, char const *argv[])
 	// Arithmetic ops
 	assert(Quat(0, Vec3(1, 2, 3)) + Quat(1, Vec3(-1, 0, -2)) == Quat(1, Vec3(0, 2, 1)));
 	assert(Quat(0, Vec3(1, 2, 3)) - Quat(1, Vec3(-1, 0, -2)) == Quat(-1, Vec3(2, 2, 5)));
-	Quat g0 = axisAngleToQuat(Vec3(1, 0, 0), pi() * 0.5);
-	Quat g1 = axisAngleToQuat(Vec3(1, 0, 0), pi());
-	Quat g2 = axisAngleToQuat(Vec3(1, 0, 0), pi() * 1.5);
+	Quat g0 = axisAngleToQuat(Vec3(1, 0, 0), math::pi() * 0.5);
+	Quat g1 = axisAngleToQuat(Vec3(1, 0, 0), math::pi());
+	Quat g2 = axisAngleToQuat(Vec3(1, 0, 0), math::pi() * 1.5);
 	assertVerbose(closeEnough(g1 * g0, g2, 0.0001), g1 * g0, " != ", g2);
 	assertVerbose(closeEnough(g1 / g0, g0, 0.0001), g1 / g0, " != ", g0);
 	assert(Quat(0, Vec3(1, 2, 3)) + 2 == Quat(2, Vec3(3, 4, 5)));
@@ -94,7 +94,7 @@ int main(int argc, char const *argv[])
 	assert(2 + Quat(0, Vec3(1, -2, -1)) == Quat(2, Vec3(3, 0, 1)));
 	assert(2 - Quat(0, Vec3(-1, 2, 3)) == Quat(2, Vec3(3, 0, -1)));
 	assert(2 * Quat(0, Vec3(-1, 2, 3)) == Quat(0, Vec3(-2, 4, 6)));
-	assert(closeEnough(1 / g0, axisAngleToQuat(Vec3(1, 0, 0), -pi() * 0.5), 0.0001));
+	assert(closeEnough(1 / g0, axisAngleToQuat(Vec3(1, 0, 0), -math::pi() * 0.5), 0.0001));
 
 	// Free function mathematical properties
 	assert(dot(Quat(1, Vec3(-1, 2, -2)), Quat(-2, Vec3(-1, 2, 1))) == 1);
@@ -102,8 +102,8 @@ int main(int argc, char const *argv[])
 	Quat h0(-1, Vec3(2, -3, 4));
 	assert(normalize(h0) == h0.normalized());
 	assertVerbose(closeEnough(reciprocate(h0), h0.reciprocal(), 0.0001), reciprocate(h0), " != ", h0.reciprocal());
-	assert(closeEnough(axisAngleToQuat(Vec3(1, 0, 0), pi() * 0.5), Quat(0.7071067811882787, Vec3(0.7071067811848163, 0.0, 0.0)), 0.0001));
-	Vec3 rotated = rotate(Vec3(1, 1, 0), axisAngleToQuat(Vec3(0, 0, 1), pi() * 0.5));
+	assert(closeEnough(axisAngleToQuat(Vec3(1, 0, 0), math::pi() * 0.5), Quat(0.7071067811882787, Vec3(0.7071067811848163, 0.0, 0.0)), 0.0001));
+	Vec3 rotated = rotate(Vec3(1, 1, 0), axisAngleToQuat(Vec3(0, 0, 1), math::pi() * 0.5));
 	assertVerbose(closeEnough(rotated, Vec3(-1, 1, 0), 0.0001), rotated);
 
 	return 0;

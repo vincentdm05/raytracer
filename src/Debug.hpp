@@ -6,11 +6,19 @@
 #include <cstdlib>
 #include <iostream>
 
-template <typename ... Args>
-void toCerr(Args&&... args)
+template <typename Arg>
+std::ostream &toCerr(Arg arg)
 {
-	(void)(int[]){0, (void(std::cerr << std::forward<Args>(args)), 0)...};
-	std::cerr << std::endl;
+	std::cerr << arg;
+	return std::cerr;
+}
+
+template <typename Arg, typename ... Args>
+std::ostream &toCerr(Arg arg, Args&&... args)
+{
+	toCerr(arg);
+	toCerr(std::forward<Args>(args)...);
+	return std::cerr;
 }	
 
 #ifdef NDEBUG
@@ -24,21 +32,21 @@ void toCerr(Args&&... args)
 #define assertVerbose(cond, ...) \
 	if (!(cond)) \
 	{ \
-		toCerr("Assertion failed: (", #cond, "), (", __VA_ARGS__, "), function ", __func__, ", file ", __FILE__, ", line ", __LINE__, "."); \
+		toCerr("Assertion failed: (", #cond, "), (", __VA_ARGS__, "), function ", __func__, ", file ", __FILE__, ", line ", __LINE__, ".") << std::endl; \
 		abort(); \
 	}
 
 #define assertEqual(left, right) \
 	if (!(left == right)) \
 	{ \
-		toCerr("Assertion failed: ", #left, " does not equal ", #right, " (", left, " != ", right, "), function ", __func__, ", file ", __FILE__, ", line ", __LINE__, "."); \
+		toCerr("Assertion failed: ", #left, " does not equal ", #right, " (", left, " != ", right, "), function ", __func__, ", file ", __FILE__, ", line ", __LINE__, ".") << std::endl; \
 		abort(); \
 	}
 
 #define assertEqualWithTolerance(left, right, epsilon) \
 	if (!closeEnough(left, right, epsilon)) \
 	{ \
-		toCerr("Assertion failed: ", #left, " does not equal ", #right, " (", left, " != ", right, "), function ", __func__, ", file ", __FILE__, ", line ", __LINE__, "."); \
+		toCerr("Assertion failed: ", #left, " does not equal ", #right, " (", left, " != ", right, "), function ", __func__, ", file ", __FILE__, ", line ", __LINE__, ".") << std::endl; \
 		abort(); \
 	}
 

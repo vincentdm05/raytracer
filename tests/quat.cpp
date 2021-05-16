@@ -54,9 +54,10 @@ int main(int argc, char const *argv[])
 	e1.getAxisAngle(axis, angle);
 	assertVerbose(axis.normalize() == Vec3(1, 0, 0), axis, " != ", Vec3(1, 0, 0));
 	assertVerbose(closeEnough(angle, math::pi(), 0.0001), angle, " != ", math::pi());
-	e1 /= e1;
+	Quat e2 = e1;
+	e1 /= e2;
 	assertVerbose(e1 == Quat(), e1, " != ", Quat());
-	Quat e2(1, Vec3(-1, 0, 1));
+	e2 = Quat(1, Vec3(-1, 0, 1));
 	e2 += 1;
 	assertVerbose(e2 == Quat(2, Vec3(0, 1, 2)), e2);
 	e2 -= 2;

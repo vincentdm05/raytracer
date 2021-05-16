@@ -30,7 +30,7 @@ do_test()
 		return 1
 	fi
 
-	"${execName}" |& awk '{print "[Test>'"${testName}"'] " $0}'
+	"${execName}" 2>&1 | awk '{print "[Test>'"${testName}"'] " $0}'
 
 	status="${PIPESTATUS[0]}"
 	if [[ "${status}" -ne 0 ]]; then

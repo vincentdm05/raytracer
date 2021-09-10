@@ -24,7 +24,18 @@ bool Metal::scatter(const Ray &rIn, const HitRecord &hr, Vec3 &attenuation, Ray 
 {
 	Vec3 reflected = reflect(rIn.direction(), hr.normal);
 	if (roughness)
-		reflected += roughness * sampleUnitSphere();
+	{
+		// Regenerate reflected rays that fall below the surface
+		uint count = 0;
+		Vec3 reflectedAttempt;
+		do
+		{
+			reflectedAttempt = reflected + roughness * sampleUnitSphere();
+			count++;
+		}
+		while (count < 10 && dot(hr.normal, reflectedAttempt) < 0.0);
+		reflected = reflectedAttempt;
+	}
 	scattered = Ray(hr.point, reflected);
 	attenuation = albedo;
 	return dot(reflected, hr.normal) > 0;

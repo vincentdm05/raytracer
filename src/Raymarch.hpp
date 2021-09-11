@@ -15,55 +15,86 @@
 #include "Vec3.hpp"
 #include "Viewport.hpp"
 
-class Raytrace : public PixelRenderer
+class Raymarch : public PixelRenderer
 {
 protected:
 	const Camera &camera;
 	const Scene &scene;
 	Image &image;
-	uint maxBounces = 50;
-	uint samplesPerPixel = 100;
+	uint maxRayIterations = 300;
+	uint maxBounces = 10;
+	uint samplesPerPixel = 1;
+	Real maxRayLength = 1000.0;
+	Real hitEpsilon = 1e-4;
 
 	Vec3 getColour(const Ray &r, uint bounces = 0) const;
 
 public:
-	Raytrace(const Scene &s, const Camera &cam, const Viewport &vp, Image &img);
+	Raymarch(const Scene &s, const Camera &cam, const Viewport &vp, Image &im);
 
 	virtual void renderPixel(uint col, uint row) const override;
 
+	// Number of full scene SDF evaluations before returning a miss
+	void setMaxRayIterations(uint n) { maxRayIterations = n; }
 	// Maximum number of times a ray is allowed to bounce off a surface
 	void setMaxBounces(uint n) { maxBounces = n; }
 	// Number of anti-aliasing multisample takes per pixel
 	void setSamplesPerPixel(uint n) { samplesPerPixel = n; }
+	// Ray length cutoff to prevent pointlessly hitting max iterations towards background
+	void setMaxRayLength(Real l) { maxRayLength = l; }
+	// Distance below which a hit is declared
+	void setHitEpsilon(Real e) { hitEpsilon = e; }
 };
 
-// TODO: this is recursive, try iterative
-Vec3 Raytrace::getColour(const Ray &r, uint bounces) const
+Vec3 Raymarch::getColour(const Ray &r, uint bounces) const
 {
+	bool hit = false;
 	HitRecord rec;
-	if (scene.hit(r, 0.001, math::maxReal(), rec))
+	Real dist = 0.0;
+	uint iteration = 0;
+	for (; iteration < maxRayIterations; iteration++)
+	{
+		Vec3 point = r.to(dist);
+		rec.t = math::maxReal();
+		hit = scene.hitWithSDF(point, hitEpsilon, rec);
+
+		rec.t = math::abs(rec.t);
+		dist += rec.t;
+
+		if (hit || dist < rec.t || dist > maxRayLength)
+			break;
+	}
+
+	if (hit)
 	{
 		Ray scattered;
 		Vec3 attenuation;
 		const Material *material = rec.hitable ? rec.hitable->getMaterial() : nullptr;
 		Vec3 emission = material ? material->emitted(rec.point) : Vec3();
+
 		if (bounces < maxBounces && material && material->scatter(r, rec, attenuation, scattered))
+		{
+			Vec3 pushNormal = dot(rec.normal, scattered.direction()) >= 0.0 ? rec.normal : -rec.normal;
+			scattered = Ray(scattered.origin() + pushNormal * hitEpsilon, scattered.direction());
 			return emission + getColour(scattered, bounces + 1) * attenuation;
+		}
 		else
+		{
 			return emission;
+		}
 	}
 
 	return scene.background().sample(r.direction());
 }
 
-Raytrace::Raytrace(const Scene &s, const Camera &cam, const Viewport &vp, Image &img)
+Raymarch::Raymarch(const Scene &s, const Camera &cam, const Viewport &vp, Image &im)
 : PixelRenderer(vp)
 , camera(cam)
 , scene(s)
-, image(img)
+, image(im)
 {}
 
-void Raytrace::renderPixel(uint col, uint row) const
+void Raymarch::renderPixel(uint col, uint row) const
 {
 	Real u = Real(col);
 	Real v = Real(row);

@@ -17,7 +17,9 @@ public:
 		material = &_material;
 	}
 
-	virtual bool hit(const Ray &r, Real minDist, Real maxDist, HitRecord &rec) const;
+	virtual bool hit(const Ray &r, Real minDist, Real maxDist, HitRecord &rec) const override;
+	virtual Real evaluateSDF(const Vec3 &point) const override;
+	virtual Vec3 evaluateNormalFromSDF(const Vec3 &point, Real epsilon) const override;
 };
 
 bool Sphere::hit(const Ray &r, Real minDist, Real maxDist, HitRecord &rec) const
@@ -49,9 +51,19 @@ bool Sphere::hit(const Ray &r, Real minDist, Real maxDist, HitRecord &rec) const
 			rec.t = (-b + discriminant) / a;
 			rec.point = r.to(rec.t);
 			rec.normal = (rec.point - center) / radius;
-			rec.material = material;
+			rec.hitable = this;
 		}
 	}
 
 	return hit;
+}
+
+Real Sphere::evaluateSDF(const Vec3 &point) const
+{
+	return (point - transform.translation()).length() - transform.scale();
+}
+
+Vec3 Sphere::evaluateNormalFromSDF(const Vec3 &point, Real epsilon) const
+{
+	return (point - transform.translation()) * transform.inverseScale();
 }

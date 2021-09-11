@@ -54,6 +54,16 @@ inline Real max(Real a, Real b)
 	return a > b ? a : b;
 }
 
+inline int sign(int a)
+{
+	return a > 0 ? 1 : -1;
+}
+
+inline Real sign(Real a)
+{
+	return a > Real(0) ? Real(1) : Real(-1);
+}
+
 inline Real abs(Real a)
 {
 	return std::abs(a);

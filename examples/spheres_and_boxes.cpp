@@ -8,6 +8,7 @@
 #include "Image.hpp"
 #include "Lambertian.hpp"
 #include "Metal.hpp"
+#include "Raymarch.hpp"
 #include "Raytrace.hpp"
 #include "Renderer.hpp"
 #include "Scene.hpp"
@@ -17,7 +18,9 @@
 
 int main(int argc, char *argv[])
 {
-	Viewport viewport(512, 256);
+	uint height = 256;
+	const Real aspectRatio = 2.0;
+	Viewport viewport(height * aspectRatio, height);
 	ImageDesc imageDesc;
 	imageDesc.width = viewport.width();
 	imageDesc.height = viewport.height();
@@ -59,11 +62,20 @@ int main(int argc, char *argv[])
 	scene.add(hitable5);
 	scene.add(hitable6);
 
+#if 1
 	Raytrace raytrace(scene, camera, viewport, image);
 	Renderer renderer;
 	renderer.render(raytrace);
+#else
+	Raymarch raymarch(scene, camera, viewport, image);
+	raymarch.setMaxRayIterations(200);
+	raymarch.setHitEpsilon(0.001);
+	raymarch.setSamplesPerPixel(4);
+	Renderer renderer;
+	renderer.render(raymarch);
+#endif
 
-	file::writePpm(argv[argc > 1 ? 1 : 0], image, 255);
+	file::writePpm(argv[argc > 1 ? 1 : 0], image);
 
 	return 0;
 }

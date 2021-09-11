@@ -18,7 +18,7 @@ public:
 	Dielectric(Real _refractiveIndex) { refractiveIndex = _refractiveIndex; }
 	Dielectric(const Vec3 &_albedo, Real _refractiveIndex) { albedo = _albedo; refractiveIndex = _refractiveIndex; }
 
-	virtual bool scatter(const Ray &rIn, const HitRecord &hr, Vec3 &attenuation, Ray &scattered) const;
+	virtual bool scatter(const Ray &rIn, const HitRecord &hr, Vec3 &attenuation, Ray &scattered) const override;
 };
 
 bool Dielectric::scatter(const Ray &rIn, const HitRecord &hr, Vec3 &attenuation, Ray &scattered) const

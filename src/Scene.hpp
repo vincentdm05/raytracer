@@ -18,7 +18,9 @@ public:
 	Scene(uint size) { hitables.reserve(size); }
 	~Scene() { hitables.clear(); }
 
-	virtual bool hit(const Ray &r, Real minDist, Real maxDist, HitRecord &rec) const;
+	virtual bool hit(const Ray &r, Real minDist, Real maxDist, HitRecord &rec) const override;
+	virtual bool hitWithSDF(const Vec3 &point, Real epsilon, HitRecord &rec) const override;
+	virtual Real evaluateSDF(const Vec3 &point) const override;
 
 	void setBackground(const Background &_background) { bg = _background; }
 	const Background &background() const { return bg; }
@@ -40,4 +42,30 @@ bool Scene::hit(const Ray &r, Real minDist, Real maxDist, HitRecord &rec) const
 		}
 	}
 	return hit;
+}
+
+bool Scene::hitWithSDF(const Vec3 &point, Real epsilon, HitRecord &rec) const
+{
+	for (const Hitable *hitable : hitables)
+	{
+		HitRecord tmpRec;
+		if (hitable->hitWithSDF(point, epsilon, tmpRec))
+		{
+			rec = tmpRec;
+			return true;
+		}
+		else if (math::abs(tmpRec.t) < math::abs(rec.t))
+		{
+			rec.t = tmpRec.t;
+		}
+	}
+	return false;
+}
+
+Real Scene::evaluateSDF(const Vec3 &point) const
+{
+	Real minDist = math::maxReal();
+	for (const Hitable *hitable : hitables)
+		minDist = math::min(minDist, hitable->evaluateSDF(point));
+	return minDist;
 }

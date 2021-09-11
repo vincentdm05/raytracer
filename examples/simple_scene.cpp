@@ -7,6 +7,7 @@
 #include "Image.hpp"
 #include "Lambertian.hpp"
 #include "Metal.hpp"
+#include "Raymarch.hpp"
 #include "Raytrace.hpp"
 #include "Renderer.hpp"
 #include "Scene.hpp"
@@ -46,9 +47,18 @@ int main(int argc, char *argv[])
 	scene.add(sphere3);
 	scene.add(sphere4);
 
+#if 1
 	Raytrace raytrace(scene, camera, viewport, image);
 	Renderer renderer;
 	renderer.render(raytrace);
+#else
+	Raymarch raymarch(scene, camera, viewport, image);
+	raymarch.setMaxRayIterations(200);
+	raymarch.setHitEpsilon(0.001);
+	raymarch.setSamplesPerPixel(4);
+	Renderer renderer;
+	renderer.render(raymarch);
+#endif
 
 	file::writePpm(argv[argc > 1 ? 1 : 0], image, 255);
 

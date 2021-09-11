@@ -15,7 +15,8 @@ public:
 	Box() {}
 	Box(const Transform &t, const Vec3 &extents, const Material &_material);
 
-	virtual bool hit(const Ray &r, Real minDist, Real maxDist, HitRecord &rec) const;
+	virtual bool hit(const Ray &r, Real minDist, Real maxDist, HitRecord &rec) const override;
+	virtual Real evaluateSDF(const Vec3 &point) const override;
 };
 
 Box::Box(const Transform &t, const Vec3 &extents, const Material &_material)
@@ -68,9 +69,16 @@ bool Box::hit(const Ray &r, Real minDist, Real maxDist, HitRecord &rec) const
 		rec.t = hitDistance;
 		rec.point = r.to(rec.t);
 		rec.normal = rotate(sgn, transform.rotation());
-		rec.material = material;
+		rec.hitable = this;
 		return true;
 	}
 
 	return false;
+}
+
+Real Box::evaluateSDF(const Vec3 &point) const
+{
+	Vec3 p = transform.applyInverse(point);
+	Vec3 diff = (abs(p) - halfExtents) * transform.scale();
+	return max(diff, Vec3()).length() + math::min(max(diff), Real(0));
 }

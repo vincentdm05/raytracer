@@ -17,7 +17,7 @@ public:
 	Metal(const Vec3 &_albedo) : Metal(_albedo, 0) {}
 	Metal(const Vec3 &_albedo, Real _roughness) { albedo = _albedo; roughness = math::clamp(_roughness, 0.0, 1.0); }
 
-	virtual bool scatter(const Ray &rIn, const HitRecord &hr, Vec3 &attenuation, Ray &scattered) const;
+	virtual bool scatter(const Ray &rIn, const HitRecord &hr, Vec3 &attenuation, Ray &scattered) const override;
 };
 
 bool Metal::scatter(const Ray &rIn, const HitRecord &hr, Vec3 &attenuation, Ray &scattered) const

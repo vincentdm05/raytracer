@@ -19,7 +19,7 @@ public:
 	Lambertian(const Texture &_texture) { texture = &_texture; }
 	~Lambertian();
 
-	virtual bool scatter(const Ray &rIn, const HitRecord &hr, Vec3 &attenuation, Ray &scattered) const;
+	virtual bool scatter(const Ray &rIn, const HitRecord &hr, Vec3 &attenuation, Ray &scattered) const override;
 };
 
 Lambertian::Lambertian(const Vec3 &albedo)

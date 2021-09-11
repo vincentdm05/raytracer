@@ -7,6 +7,7 @@
 #include "Image.hpp"
 #include "Lambertian.hpp"
 #include "Metal.hpp"
+#include "Preview.hpp"
 #include "Raymarch.hpp"
 #include "Raytrace.hpp"
 #include "Renderer.hpp"
@@ -56,20 +57,20 @@ int main(int argc, char *argv[])
 	Box bigBox(Transform(axisAngleToQuat(Vec3(0.0, 1.0, 0.0), math::pi() / 180.0 * 15.0), Vec3(368.5, 165.0, 351.5), 1.0), Vec3(165.0, 330.0, 165.0), white);
 	scene.add(bigBox);
 
-#if 1
+	Preview preview(scene, camera, viewport, image);
+	preview.setSamplesPerPixel(10);
 	Raytrace raytrace(scene, camera, viewport, image);
 	raytrace.setSamplesPerPixel(100);
-	Renderer renderer;
-	renderer.render(raytrace);
-#else
 	Raymarch raymarch(scene, camera, viewport, image);
 	raymarch.setMaxRayLength(1500.0);
 	raymarch.setMaxRayIterations(100);
 	raymarch.setHitEpsilon(1);
 	raymarch.setSamplesPerPixel(100);
+
 	Renderer renderer;
-	renderer.render(raymarch);
-#endif
+	// renderer.render(preview);
+	renderer.render(raytrace);
+	// renderer.render(raymarch);
 
 	file::writePpm(argv[argc > 1 ? 1 : 0], image, 255);
 

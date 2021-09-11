@@ -5,6 +5,7 @@
 #include "File.hpp"
 #include "Image.hpp"
 #include "Metal.hpp"
+#include "Preview.hpp"
 #include "Raymarch.hpp"
 #include "Raytrace.hpp"
 #include "Renderer.hpp"
@@ -43,20 +44,20 @@ int main(int argc, char *argv[])
 		scene.add(*spheres.back());
 	}
 
-#if 1
 	Raytrace raytrace(scene, camera, viewport, image);
-	Renderer renderer;
-	renderer.render(raytrace);
-#else
+	Preview preview(scene, camera, viewport, image);
+	preview.setSamplesPerPixel(100);
 	Raymarch raymarch(scene, camera, viewport, image);
 	raymarch.setMaxRayIterations(200);
 	raymarch.setHitEpsilon(0.001);
 	raymarch.setSamplesPerPixel(50);
-	Renderer renderer;
-	renderer.render(raymarch);
-#endif
 
-	file::writePpm(argv[argc > 1 ? 1 : 0], image, 255);
+	Renderer renderer;
+	renderer.render(raytrace);
+	// renderer.render(preview);
+	// renderer.render(raymarch);
+
+	file::writePpm(argv[argc > 1 ? 1 : 0], image);
 
 	for (Material *material : materials)
 		delete material;

@@ -7,6 +7,7 @@
 #include "Image.hpp"
 #include "Lambertian.hpp"
 #include "Metal.hpp"
+#include "Preview.hpp"
 #include "Raymarch.hpp"
 #include "Raytrace.hpp"
 #include "Renderer.hpp"
@@ -74,18 +75,18 @@ int main(int argc, char *argv[])
 	for (Hitable *hitable : objects)
 		scene.add(*hitable);
 
-#if 1
+	Preview preview(scene, camera, viewport, image);
+	preview.setSamplesPerPixel(10);
 	Raytrace raytrace(scene, camera, viewport, image);
-	Renderer renderer;
-	renderer.render(raytrace);
-#else
 	Raymarch raymarch(scene, camera, viewport, image);
 	raymarch.setMaxRayIterations(200);
 	raymarch.setHitEpsilon(0.001);
 	raymarch.setSamplesPerPixel(1);
+
 	Renderer renderer;
-	renderer.render(raymarch);
-#endif
+	// renderer.render(preview);
+	renderer.render(raytrace);
+	// renderer.render(raymarch);
 
 	file::writePpm(argv[argc > 1 ? 1 : 0], image, 255);
 

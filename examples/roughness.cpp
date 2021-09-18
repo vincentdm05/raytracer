@@ -44,17 +44,16 @@ int main(int argc, char *argv[])
 		scene.add(*spheres.back());
 	}
 
-	Raytrace raytrace(scene, camera, viewport, image);
 	Preview preview(scene, camera, viewport, image);
-	preview.setSamplesPerPixel(100);
+	Raytrace raytrace(scene, camera, viewport, image);
 	Raymarch raymarch(scene, camera, viewport, image);
 	raymarch.setMaxRayIterations(200);
 	raymarch.setHitEpsilon(0.001);
 	raymarch.setSamplesPerPixel(50);
 
 	Renderer renderer;
-	renderer.render(raytrace);
 	// renderer.render(preview);
+	renderer.render(raytrace);
 	// renderer.render(raymarch);
 
 	file::writePpm(argv[argc > 1 ? 1 : 0], image);

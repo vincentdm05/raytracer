@@ -76,7 +76,6 @@ int main(int argc, char *argv[])
 		scene.add(*hitable);
 
 	Preview preview(scene, camera, viewport, image);
-	preview.setSamplesPerPixel(10);
 	Raytrace raytrace(scene, camera, viewport, image);
 	Raymarch raymarch(scene, camera, viewport, image);
 	raymarch.setMaxRayIterations(200);
@@ -88,7 +87,7 @@ int main(int argc, char *argv[])
 	renderer.render(raytrace);
 	// renderer.render(raymarch);
 
-	file::writePpm(argv[argc > 1 ? 1 : 0], image, 255);
+	file::writePpm(argv[argc > 1 ? 1 : 0], image);
 
 	for (Hitable *hitable : objects)
 		delete hitable;

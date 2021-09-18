@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 	scene.add(bigBox);
 
 	Preview preview(scene, camera, viewport, image);
-	preview.setSamplesPerPixel(10);
+	preview.setUseFakeLight(true);
 	Raytrace raytrace(scene, camera, viewport, image);
 	raytrace.setSamplesPerPixel(100);
 	Raymarch raymarch(scene, camera, viewport, image);
@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
 	renderer.render(raytrace);
 	// renderer.render(raymarch);
 
-	file::writePpm(argv[argc > 1 ? 1 : 0], image, 255);
+	file::writePpm(argv[argc > 1 ? 1 : 0], image);
 
 	return 0;
 }

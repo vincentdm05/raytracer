@@ -12,6 +12,13 @@ All sample programs will take as argument the name of a file to write to, if no 
 
 Then simply open the generated `output_file.ppm` with your image viewer of choice.
 
+You can also build the "main" program with viewer using cmake. From the project root directory:
+`mkdir build`
+`cd build`
+`cmake .. && make`
+
+And run `bin/raytracer`.
+
 
 ### Samples
 
